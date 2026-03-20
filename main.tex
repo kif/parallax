@@ -88,7 +88,7 @@ Numerical simulation and correction of the 2θ values due to parallax effect, i.
 \begin{abstract}
 
 The parallax effect in X-ray area detectors arises when X-rays from a point source (e.g. a scattering sample) traverse thick detection layers, causing a shift in the apparent position of detected events. This can degrade the angular resolution and introduce artifacts, especially in pair distribution function (PDF) analysis and powder diffraction measurements.
-In thick detectors, X-rays at high scattering angles may pass through multiple pixels, leading to discrepancies between observed and actual scattering angles (2θ)
+In thick detectors, X-rays at high scattering angles may pass through multiple pixels, leading to discrepancies between observed and actual scattering angles ($2\theta$)
 
 \end{abstract}
 
@@ -101,12 +101,51 @@ In thick detectors, X-rays at high scattering angles may pass through multiple p
 
 \section{Introduction}
 
-Experimental setups are usually calibrated on synchrotron sources using the powder sample $\rm LaB_6, CeO_2$ diffraction pattern that is properly characterized (by NIST).
-Those samples show nice concentric Debye-Scherrer rings in their diffraction pattern that are analyzed with tools such as pyFAI-calib2 \cite{pyfai_2020}, Dawn \cite{fil} or 
+Experimental setups are usually calibrated on synchrotron sources using the powder sample  diffraction pattern that is properly characterized (by NIST, typically $\rm LaB_6, CeO_2$, ...).
+Those samples show nice concentric Debye-Scherrer rings in their diffraction pattern that are analyzed with tools such as pyFAI-calib2 \cite{pyfai_2020}, Dawn \cite{dawn2027} or GSAS-II \cite{GSAS-II}.
+In those tools, assign observed rings to the \textit{d-}spacing of the family of Miller plans and refine the geometry model which is based on Bragg's law:
+$$
+2d sin({\frac{2\theta}{2}}) = n \lambda
+$$
 
-\section{State of the art:}
-\section{Introduction}
+Best calibrations are obtained when using as many rings and as many control points per rings as possible.
+Nevertheless, the quality of this fit has proven to degrade when including into the calibration ring with $2\theta>30$°. 
+This effect is associated with volumetric absorption of X-ray photons in the sensitive layer of the detector, simply refered as parallax effect in the rest of the document
 
+Figure 1: Volumetric absorption of photons
+
+In this paper we first describe the various attempts to address the parallax effect, most of them are operating in 1-dimentional space, i.e. after azimuthal integration of the diffraction frame.
+Other approaches consist in ensuring photons arrive in the sensitive layer orthogonally, either by using cylindrical, spherical or multiple modules aligned along a circle.
+
+The third chapter presents the physics of volumetric photon absorption which is used to simulate the effect of Beer-Lambert's law with ray-tracing. 
+This simulation can be stored into a sparse matrix representing the shift and blurring effect of the parallax. Once calculated, this sparse matrix can not only be used to blur a synthetic diffraction image, but also to "deconvolve" an actual image using inverse methods.
+
+In the fourth chapter, we introduce the averaged parallax effect which copes for the displacement of rings. In the fifth chapter, the usage of this correction is discussed with its limitation.
+
+\section{State of the art}
+\subsection{Work in 1D}
+Simple offline data corrections have been proposed to restore original scattering information, particularly for one-dimensional parallax effects
+1.2 Use cylindrical/spherical or smaller detectors mounted on a goniometer arm
+1.3 Neural network based 
+
+\section{Physics of the parallax effect}
+   1.1. Beer-Lambert Law
+   1.2 Simulation of the parallax effect using Raytracing
+      1.2.1: Description of the implementation
+      1.2.2: blurring of a synthetic powder diffraction frame
+   1.3 Correction by deconvolution (RL, MLEM, ...)
+      1.3.1 Theory behind deconvolution
+      1.3.2 Deconvolution of synthetic data
+      1.3.3 Deconvolution of real data
+\section{Average parallax effect}
+   2.1 Calculation of the displacement
+   2.2 Correction of the displacement
+   2.3 Application to sythetic data
+   2.4 Application to experimental data (LaB6 on CdTe & Si detectors)
+\section{Discussion}
+   4.1. Usage in pyFAI, and limitations:
+   Detector thickness is only one term of peak broadening: sample height, width, pixel size, beam divergence, and wavelength dispersion are important too and not taken into account.
+   4.2. Application to powder diffraction and PDF measurement 
 
 \section{Conclusion}
 
@@ -116,7 +155,7 @@ Those samples show nice concentric Debye-Scherrer rings in their diffraction pat
 
      % Acknowledgements come after the appendices
 
-\ack{Acknowledgements:}
+\ack{Acknowledgments:}
 
 D2AM / BM02 
 
