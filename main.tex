@@ -44,8 +44,8 @@
 
 \cauthor[a]{Jérôme}{Kieffer}{jerome.kieffer@esrf.fr}{}
 \author[a]{Edgar}{Gutierrez-Fernandez}
-\author[a]{Thomas}{Vincent} 
-\author[a]{Loïc}{Huder} 
+\author[a]{Thomas}{Vincent}
+\author[a]{Loïc}{Huder}
 \author[b]{Gudrun}{Lotze}
 \author[c]{Nils}{Blanc}
 \author[c]{victor}{Poline}
@@ -64,7 +64,7 @@
 %\vita{Author's biography}
 
      % Keywords (required for Journal of Synchrotron Radiation only)
-     % Use the \keyword macro for each word or phrase, e.g. 
+     % Use the \keyword macro for each word or phrase, e.g.
      % \keyword{X-ray diffraction}\keyword{muscle}
 
 \keyword{Thick sensor}
@@ -109,7 +109,7 @@ $$
 $$
 
 Best calibrations are obtained when using as many rings and as many control points per rings as possible.
-Nevertheless, the quality of this fit has proven to degrade when including into the calibration ring with $2\theta>30$°. 
+Nevertheless, the quality of this fit has proven to degrade when including into the calibration ring with $2\theta>30$°.
 This effect is associated with volumetric absorption of X-ray photons in the sensitive layer of the detector, simply refered as parallax effect in the rest of the document
 
 Figure 1: Volumetric absorption of photons
@@ -117,35 +117,45 @@ Figure 1: Volumetric absorption of photons
 In this paper we first describe the various attempts to address the parallax effect, most of them are operating in 1-dimentional space, i.e. after azimuthal integration of the diffraction frame.
 Other approaches consist in ensuring photons arrive in the sensitive layer orthogonally, either by using cylindrical, spherical or multiple modules aligned along a circle.
 
-The third chapter presents the physics of volumetric photon absorption which is used to simulate the effect of Beer-Lambert's law with ray-tracing. 
+The third chapter presents the physics of volumetric photon absorption which is used to simulate the effect of Beer-Lambert's law with ray-tracing.
 This simulation can be stored into a sparse matrix representing the shift and blurring effect of the parallax. Once calculated, this sparse matrix can not only be used to blur a synthetic diffraction image, but also to "deconvolve" an actual image using inverse methods.
 
 In the fourth chapter, we introduce the averaged parallax effect which copes for the displacement of rings. In the fifth chapter, the usage of this correction is discussed with its limitation.
 
 \section{State of the art}
-\subsection{Work in 1D}
-Simple offline data corrections have been proposed to restore original scattering information, particularly for one-dimensional parallax effects
-1.2 Use cylindrical/spherical or smaller detectors mounted on a goniometer arm
-1.3 Neural network based 
+The parallax effect is known for a long time, and the first attempts to address it were by ensuring photons enter the sensitive layer orthogonally.
+This can be achieved by manufacturing detectors that are spherical \cite{spherical_detector}, planispherical \cite{planispherical} where the sample is located at the center of the sphere.
+Another approach is to use a cylindrical detector \cite{cylindrical_detector} where the sample is located at the center of the cylinder.
+
+
+\subsection{Correct the powder diffraction pattern}
+A simple pre-integration data corrections has been proposed to restore the actual scattering angle by applying a polynomial correction
+to the expected scattering angle \cite{parallax_polynomial}.
+The main drawback of the approach is that it requires the detector to be mounted orthogonally to the incident beam, which is limiting the accessible q-range.
+\subsection{Use cylindrical/spherical or smaller detectors mounted on a goniometer arm}
+This method
+\subsection{Neural network based corrections}
 
 \section{Physics of the parallax effect}
-   1.1. Beer-Lambert Law
-   1.2 Simulation of the parallax effect using Raytracing
-      1.2.1: Description of the implementation
-      1.2.2: blurring of a synthetic powder diffraction frame
-   1.3 Correction by deconvolution (RL, MLEM, ...)
-      1.3.1 Theory behind deconvolution
-      1.3.2 Deconvolution of synthetic data
-      1.3.3 Deconvolution of real data
-\section{Average parallax effect}
-   2.1 Calculation of the displacement
-   2.2 Correction of the displacement
-   2.3 Application to sythetic data
-   2.4 Application to experimental data (LaB6 on CdTe & Si detectors)
+\subsection{Beer-Lambert Law}
+\subsection{Simulation of the parallax effect using Raytracing}
+Description of the implementation
+\subsection{Blurring of a synthetic powder diffraction frame}
+Correction by deconvolution (RL, MLEM, ...)}
+\subsubsection{Theory behind deconvolution}
+\subsubsection{Deconvolution of synthetic data}
+\subsubsection{Deconvolution of real data}
+
+    \section{Average parallax effect}
+\subsection{Calculation of the displacement}
+\subsection{Correction of the displacement}
+\subsection{Application to synthetic data}
+\subsection{Application to experimental data (LaB6 on CdTe & Si detectors)}
 \section{Discussion}
-   4.1. Usage in pyFAI, and limitations:
-   Detector thickness is only one term of peak broadening: sample height, width, pixel size, beam divergence, and wavelength dispersion are important too and not taken into account.
-   4.2. Application to powder diffraction and PDF measurement 
+\subsection{Usage in pyFAI}
+\subsection{Limitations of the average model}
+Detector thickness is only one term of peak broadening: sample height, width, pixel size, beam divergence, and wavelength dispersion are important too and not taken into account.
+\subsection{Application to powder diffraction and PDF measurement}
 
 \section{Conclusion}
 
@@ -157,11 +167,13 @@ Simple offline data corrections have been proposed to restore original scatterin
 
 \ack{Acknowledgments:}
 
-D2AM / BM02 
+The authors would like to thank the staff of the D2AM beamline at the ESRF-BM02, especially Nils Blanc,
+for the opportunity to collect diffraction data with two detectors differing only by their sensor material.
+We would like to thanks all the people who encouraged us on the path, especially Marie Ruat and Paul-Antoine Douissard from the detector group
+at ESRF and the staff of the ID11 beamline at the ESRF for sharing their data.
+This work would not have been possible without the fruitful discussions with Veijo Honkimaki (ESRF), Vadim Diadkin and Dmitry Chernyshov (SNBL).
+Finally, we would like to thank Vincent Favre-Nicolin, head of the ADA-group and coordinator of the scattering bridge for support all along this project.
 
-Vincent Favre Nicolin
-
-We would like to thank also Jonathan P. Wright and Carlotta Giacobbe for offering us the ability to test those algorithms on small molecule data and validate the concept of sparsification on the ID11 beamline at the ESRF.
 
 \bibliographystyle{iucr}
 \bibliography{biblio}
