@@ -108,11 +108,11 @@ $$
 2d sin({\frac{2\theta}{2}}) = n \lambda
 $$
 
-Best calibrations are obtained when using as many rings and as many control points per 
+Best calibrations are obtained when using as many rings and as many control points per
 rings as possible.
-Nevertheless, the quality of this fit has proven to degrade when including into the 
+Nevertheless, the quality of this fit has proven to degrade when including into the
 calibration ring with $2\theta>30$°.
-This effect is associated with volumetric absorption of X-ray photons in the sensitive 
+This effect is associated with volumetric absorption of X-ray photons in the sensitive
 layer of the detector, simply refered as parallax effect in the rest of the document.
 
 Parallax effect has three main consquences on the powder diffraction pattern obtaines:
@@ -134,15 +134,15 @@ In the fourth chapter, we introduce the averaged parallax effect which copes for
 
 \section{State of the art}
 The parallax effect is known for a long time, since this effect is proportionnal to the
-sensitive layer thickness and detector were using ionization gaz chambers (several centimeters in size) 
+sensitive layer thickness and detector were using ionization gaz chambers (several centimeters in size)
 before the avent of CCD detectors coupled with phosphor or scintillators, much thinner.
 
      \subsection{Ensure the detector is locally orthogonal to the incident beam}
 
 The first attempts to address parallax were by ensuring photons enter the sensitive layer orthogonally.
-This can be achieved by manufacturing detectors that are spherical \cite{spherical_detector}, 
+This can be achieved by manufacturing detectors that are spherical \cite{spherical_detector},
 planispherical \cite{planispherical} where the sample is located at the center of the sphere.
-Another approach is to use a cylindrical detector \cite{cylindrical_detector} where the sample is 
+Another approach is to use a cylindrical detector \cite{cylindrical_detector} where the sample is
 located at the center of the cylinder.
 In this configuration, the parallax is accounted for only in one direction, not the other.
 Finally this effect can also be mitigated by using several smaller detector assembled in
@@ -152,12 +152,12 @@ Those methods suffer all from the same weakness, that the sample needs to be pre
 at the center of the detector geometry and any deviation may be difficult to account for.
 
      \subsection{Correct the powder diffraction pattern \textit{aposteriori}}
-A simple post-integration data corrections has been proposed to restore the actual 
-scattering angle by applying a polynomial correction to the expected scattering angle 
+A simple post-integration data corrections has been proposed to restore the actual
+scattering angle by applying a polynomial correction to the expected scattering angle
 \cite{parallax_polynomial}, possibly coupled with a re-binning of the data to ensure the
 $2\theta-$ or q-positions are evenly spaced.
-This rebinning creates an extra blurring of the signal. 
-The main drawback of the approach is that it requires the detector, supposingly flat, 
+This rebinning creates an extra blurring of the signal.
+The main drawback of the approach is that it requires the detector, supposingly flat,
 to be mounted orthogonally to the incident beam, which is limiting the accessible q-range.
 
      \subsection{Neural network based corrections}
@@ -165,27 +165,27 @@ There is a ParallaxNet \cite{ParallaxNet} autoencoder designed to address the pa
 but this autoencoder has been trained to address the variation of the sample - detector distance
 duing a diffraction tomography experiment.
 
-That said, the principle could be re-used to take the powder diffraction pattern from a 
-database like \textsc{simpod} \cite{simpod} and apply the parallax effect as described 
-in section \ref{blur}. 
+That said, the principle could be re-used to take the powder diffraction pattern from a
+database like \textsc{simpod} \cite{simpod} and apply the parallax effect as described
+in section \ref{blur}.
 The ensemble of blurred patterns + theoretical patterns could be used to train a convolutionnal
 neural network to perform the unblurring of diffraction images.
 
 \section{Physics of the parallax effect}
      \subsection{Beer-Lambert Law}
 The Beer-Lambert law describes the attenuation of light as it passes through matter:
-$$ dI = -\mu I dx$$ 
+$$ dI = -\mu I dx$$
 where $\mu$ is the linear attenuation coefficient and $x$ is the path length.
 It is more known under its integrated form, showing an exponential attenuation of light intensity:
 $$ I = I_0 e^{-\mu x}$$
-In X-ray area detectors with thick sensitive layers, this law governs the probability of photon 
+In X-ray area detectors with thick sensitive layers, this law governs the probability of photon
 interaction at different depths within the detector material.
      \subsection{Simulation of the parallax effect using raytracing}
 Raytracing is an old computer vision problem which has been efficiently solved in \citein{raytracing}.
 The implementation in pyFAI is a direct re-implementation of this seminal work.
           \subsubsection{Implementation of raytracing in pyFAI}
-The software library pyFAI contains a module which performs raytracing, throwing 
-several rays per pixel in the detector and measuring for each ray, how long the 
+The software library pyFAI contains a module which performs raytracing, throwing
+several rays per pixel in the detector and measuring for each ray, how long the
 trajectory is in each volumetric pixel (voxel?).
 
 Subsequently, the Beer-Lambert law is applied to descide how much energy is deposited in
@@ -208,8 +208,8 @@ where one pixel in the input image contributes to several pixel in the output im
                         shape=(size, size))
 \end{verbatim}
 
-In this example, the \textit{geometry.poni} file contains the detector position and description, 
-including the sensor material and thickness. 
+In this example, the \textit{geometry.poni} file contains the detector position and description,
+including the sensor material and thickness.
 It is the typical \textsc{poni}-file produced by the \textit{pyFAI-calib2} application where
 all sensor material and thicknesses for all known detectors have been tabulated (~200 detectors).
 
@@ -257,3 +257,5 @@ Finally, we would like to thank Vincent Favre-Nicolin, head of the ADA-group and
 
 \end{document}                    % DO NOT DELETE THIS LINE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
