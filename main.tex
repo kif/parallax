@@ -101,8 +101,10 @@ In thick detectors, X-rays at high scattering angles may pass through multiple p
 
 \section{Introduction}
 
-Experimental setups are usually calibrated on synchrotron sources using the powder sample  diffraction pattern that is properly characterized (by NIST, typically $\rm LaB_6, CeO_2$, ...).
-Those samples show nice concentric Debye-Scherrer rings in their diffraction pattern that are analyzed with tools such as pyFAI-calib2 \cite{pyfai_2020}, Dawn \cite{dawn2027} or GSAS-II \cite{GSAS-II}.
+Experimental setups are usually calibrated on synchrotron sources using the powder sample  diffraction pattern that
+is properly characterized (by NIST, typically $\rm LaB_6, CeO_2$, ...).
+Those samples show nice concentric Debye-Scherrer rings in their diffraction pattern that are analyzed with tools such
+as pyFAI-calib2 \cite{pyfai_2020}, Dawn \cite{dawn} or GSAS-II \cite{GSAS-II}.
 In those tools, assign observed rings to the \textit{d-}spacing of the family of Miller plans and refine the geometry model which is based on Bragg's law:
 $$
 2d sin({\frac{2\theta}{2}}) = n \lambda
@@ -123,6 +125,24 @@ Parallax effect has three main consquences on the powder diffraction pattern obt
 \end{itemize}
 
 Figure 1: Volumetric absorption of photons
+
+\subsection{Visualization of the parallax effect}
+Since the parallax effect depends on the sensor of the detector, it possible to visualize the effect
+by taking the same diffraction frame with two detectors differing only by their sensor material.
+In the figure \ref{fig:Si-CdTe}, the diffraction of a $\rm CeO_2$ and Si powder were collected on the D2AM beamline (ESRF-BM02) with a monochromatic beam at 20 keV.
+Eiger2 \cite{Eiger} 4 mega-pixel detectors were used, either with a Silicon sensor ($450 \mu$m thickness, $\mu=10.4 cm^{-1}$) or a
+Cadmium-Telluride sensor ($750 \mu$m thickness, $\mu=125.4 cm^{-1}$).
+The simple replacement of the sensor is of course not possible in such detector and we used two different detectors.
+In order to avoid any artefact originating from the calibration, the plot of the figure \ref{fig:Si-CdTe} contains actually only the
+signal of the colon of pixels where the direct-beam hits the detector.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/parallax/parallax_effect.png}
+    \caption{Parallax effect}
+    \label{fig:Si-CdTe}
+\end{figure}
+
 
 In this paper we first describe the various attempts to address the parallax effect, most of them are operating in 1-dimentional space, i.e. after azimuthal integration of the diffraction frame.
 Other approaches consist in ensuring photons arrive in the sensitive layer orthogonally, either by using cylindrical, spherical or multiple modules aligned along a circle.
