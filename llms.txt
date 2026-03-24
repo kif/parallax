@@ -1,0 +1,12 @@
+
+# Parallax
+
+This document contains the publication in Latex format about the displacement of diffraction peaks position
+in a diffraction pattern due to a volumetric absorption in the thickness of the sensor used in the detector.
+
+## Section name
+
+- [library](https://github.com/kif/parallax/tree/main/library): The library with all articles cited in this document.
+- [latex](https://github.com/kif/parallax/tree/main/main.tex): The latex source code of this document.
+
+
