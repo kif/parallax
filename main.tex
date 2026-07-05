@@ -5,7 +5,7 @@
 % Version 1.6 (28 March 2013)
 %------------------------------------------------------------------------------
 
-\documentclass[preprint]{iucr}              % DO NOT DELETE THIS LINE
+\documentclass[preprint,pdf]{iucr}              % DO NOT DELETE THIS LINE
 
      %-------------------------------------------------------------------------
      % Information about journal to which submitted
@@ -266,12 +266,89 @@ the sensor materials and thicknesses of all known detectors have been tabulated 
 
 \section{Average parallax effect}
      \subsection{Calculation of the displacement}
+     \label{sec:displacement}
+
+The average displacement of the detected signal caused by the parallax effect can be
+calculated analytically for a flat sensor of thickness $t$.
+Let $\alpha$ be the incidence angle of the X-ray on the sensor, measured from the normal
+to its surface, $z$ the depth inside the sensor below the point of incidence (POI) and
+$x$ the lateral position on the sensor surface, measured along the projection of the ray.
+
+The average displacement $\langle x \rangle$ of the deposited energy is the expectation
+value of the observable $x(z)$:
+\begin{equation}
+\label{eq:expectation}
+\langle x \rangle = \int_0^{t} x(z) \cdot P(z) \, dz
+\end{equation}
+where $P(z)$ is the probability density for the photon to interact at depth $z$.
+Geometrically, one has:
+\begin{equation}
+\label{eq:geometry}
+x(z) = z \tan(\alpha)
+\end{equation}
+and $P(z)$ follows the Beer--Lambert law (equation \ref{eq:beer-lambert-integrated}),
+the path travelled in the sensor to reach the depth $z$ being $z/\cos(\alpha)$:
+\begin{equation}
+\label{eq:proba}
+P(z) = A \, e^{\frac{-\mu z}{\cos(\alpha)}} = A \, e^{-\mu' z}
+\end{equation}
+with $\mu' = \mu / \cos(\alpha)$ the apparent attenuation coefficient along the depth
+and $A$ a normalization constant.
+Since a signal has been recorded, the photon is known to have interacted somewhere
+within the sensor thickness, so $P$ is normalized over $[0, t]$:
+\begin{equation}
+\label{eq:normalization}
+1 = \int_0^{t} P(z) \, dz
+\end{equation}
+which leads to:
+\begin{equation}
+\label{eq:proba-normed}
+P(z) = \mu' \cdot \frac{e^{-\mu' z}}{1 - e^{-\mu' t}}
+\end{equation}
+After integration of equation \ref{eq:expectation} by parts, the average displacement becomes:
+\begin{equation}
+\label{eq:mean-displacement}
+\langle x \rangle = \frac{\sin(\alpha)}{\mu} \cdot \frac{1 - (1 + \mu' t) \, e^{-\mu' t}}{1 - e^{-\mu' t}}
+\end{equation}
+This average displacement depends only on quantities available in the geometry
+description of the experimental setup: the incidence angle of the ray, the linear
+attenuation coefficient of the sensor material at the given photon energy and the
+sensor thickness.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/parallax/pyfai_calib2_parallax.png}
+    \caption{Experiment-settings tab of the \textit{pyFAI-calib2} graphical user interface.
+    The sensor material and thickness (here Si, $450\ \mu$m) are displayed in the
+    detector description, and the \textit{Plx} button activates the parallax correction
+    described in section \ref{sec:displacement}.}
+    \label{fig:calib2-parallax}
+\end{figure}
+
+It is worth noting that if the sensor is assumed to be infinitely thick
+($t \rightarrow \infty$), the same integral leads to the simpler expression:
+\begin{equation}
+\label{eq:thick-sensor}
+\langle x \rangle = \frac{\sin(\alpha)}{\mu}
+\end{equation}
+an equation which is already available in \cite{resolution_function}.
+
      \subsection{Correction of the displacement}
+The correction consists in shifting the position of every pixel by the average
+displacement $\langle x \rangle$ given by equation \ref{eq:mean-displacement},
+in the direction opposite to the propagation of the ray.
+In pyFAI, this correction is obtained by linear interpolation from the scattering
+angles calculated after correction.
+
      \subsection{Application to synthetic data}
      \subsection{Application to experimental data ($\rm LaB_6$ on CdTe \& Si detectors)}
 
 \section{Discussion}
      \subsection{Usage in pyFAI}
+The sensor material and thickness are part of the detector description in pyFAI,
+and the correction can be activated directly from the \textit{pyFAI-calib2} graphical
+user interface, as shown in figure \ref{fig:calib2-parallax}.
+
      \subsection{Limitations of the average model}
 The detector thickness is only one contribution to peak broadening: sample height and width, pixel size, beam divergence and wavelength dispersion are also important and are not taken into account.
      \subsection{Application to powder diffraction and PDF measurement}
