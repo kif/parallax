@@ -48,7 +48,7 @@
 \author[a]{Loïc}{Huder}
 \author[b]{Gudrun}{Lotze}
 \author[c]{Nils}{Blanc}
-\author[c]{victor}{Poline}
+\author[c]{Victor}{Poline}
 
 \aff[a]{European Synchrotron Radiation Facility;71, avenue des Martyrs;CS 40220;38043 Grenoble Cedex 9 \country{France}}
 \aff[b]{TBD}
@@ -70,6 +70,8 @@
 \keyword{Thick sensor}
 \keyword{Diffraction setup calibration}
 \keyword{Detector physics}
+\keyword{Parallax effect}
+\keyword{Powder diffraction}
 
      % PDB and NDB reference codes for structures referenced in the article and
      % deposited with the Protein Data Bank and Nucleic Acids Database (Acta
@@ -82,13 +84,23 @@
 \maketitle                        % DO NOT DELETE THIS LINE
 
 \begin{synopsis}
-Numerical simulation and correction of the 2θ values due to parallax effect, i.e. volumetric absorption of photons in the thickness of the sensor layer.
+Numerical simulation and correction of the $2\theta$ values due to the parallax effect, i.e. volumetric absorption of photons in the thickness of the sensor layer.
 \end{synopsis}
 
 \begin{abstract}
 
-The parallax effect in X-ray area detectors arises when X-rays from a point source (e.g. a scattering sample) traverse thick detection layers, causing a shift in the apparent position of detected events. This can degrade the angular resolution and introduce artifacts, especially in pair distribution function (PDF) analysis and powder diffraction measurements.
-In thick detectors, X-rays at high scattering angles may pass through multiple pixels, leading to discrepancies between observed and actual scattering angles ($2\theta$)
+The parallax effect in X-ray area detectors arises when X-rays emitted from a point source (e.g. a scattering sample)
+traverse a thick sensitive layer, causing a shift in the apparent position of the detected events.
+This shift displaces and broadens the diffraction peaks, which degrades the angular resolution
+and introduces artefacts, especially in powder diffraction and pair distribution function (PDF) measurements.
+In thick sensors, X-rays with incidence angles above 30$^\circ$ may cross several pixels, leading to discrepancies
+between observed and expected scattering angles ($2\theta$).
+In this contribution, the parallax effect is simulated by ray tracing based on the Beer--Lambert law and validated on synthetic data.
+Several correction strategies are compared, in particular a new integral method, implemented in the pyFAI library,
+which corrects the pixel positions regardless of the detector position and orientation.
+The corrections are assessed against experimental data collected from reference samples (silicon, ceria)
+on the D2AM beamline (ESRF-BM02) using Eiger2 detectors equipped with either a $450\ \mu$m silicon sensor
+or a $750\ \mu$m cadmium telluride sensor.
 
 \end{abstract}
 
@@ -101,118 +113,128 @@ In thick detectors, X-rays at high scattering angles may pass through multiple p
 
 \section{Introduction}
 
-Experimental setups are usually calibrated on synchrotron sources using the powder sample  diffraction pattern that
-is properly characterized (by NIST, typically $\rm LaB_6, CeO_2$, ...).
-Those samples show nice concentric Debye-Scherrer rings in their diffraction pattern that are analyzed with tools such
+Experimental setups are usually calibrated at synchrotron sources using the diffraction pattern of a properly
+characterized powder sample (by NIST, typically $\rm LaB_6, CeO_2$, ...).
+Those samples show well-defined concentric Debye--Scherrer rings in their diffraction pattern that are analyzed with tools such
 as pyFAI-calib2 \cite{pyfai_2020}, Dawn \cite{dawn} or GSAS-II \cite{GSAS-II}.
-In those tools, assign observed rings to the \textit{d-}spacing of the family of Miller plans and refine the geometry model which is based on Bragg's law:
-$$
-2d sin({\frac{2\theta}{2}}) = n \lambda
-$$
+These tools assign the observed rings to the \textit{d-}spacings of the families of Miller planes and refine the geometry model, which is based on Bragg's law:
+\begin{equation}
+\label{eq:bragg}
+2d \sin \left({\frac{2\theta}{2}}\right) = n \lambda
+\end{equation}
 
 Best calibrations are obtained when using as many rings and as many control points per
 rings as possible.
-Nevertheless, the quality of this fit has proven to degrade when including into the
-calibration ring with $2\theta>30$°.
+Nevertheless, the quality of this fit has proven to degrade when including rings with
+$2\theta>30$° into the calibration.
 This effect is associated with volumetric absorption of X-ray photons in the sensitive
-layer of the detector, simply refered as parallax effect in the rest of the document.
+layer of the detector, simply referred to as the parallax effect in the rest of the document.
 
-Parallax effect has three main consquences on the powder diffraction pattern obtaines:
+The parallax effect has three main consequences on the obtained powder diffraction pattern:
 \begin{itemize}
      \item Peak broadening
-     \item Peak assymmetry (the peak maximum is usually close to the lowest $2\theta$ values)
-     \item Preak profile distortion which are likely to jeoparidize Rietveld refinements
+     \item Peak asymmetry (the peak maximum is usually close to the lowest $2\theta$ values)
+     \item Peak profile distortions which are likely to jeopardize Rietveld refinements
 \end{itemize}
 
 Figure 1: Volumetric absorption of photons
 
 \subsection{Visualization of the parallax effect}
-Since the parallax effect depends on the sensor of the detector, it possible to visualize the effect
+Since the parallax effect depends on the sensor of the detector, it is possible to visualize the effect
 by taking the same diffraction frame with two detectors differing only by their sensor material.
-In the figure \ref{fig:Si-CdTe}, the diffraction of a $\rm CeO_2$ and Si powder were collected on the D2AM beamline (ESRF-BM02) with a monochromatic beam at 20 keV.
-Eiger2 \cite{Eiger} 4 mega-pixel detectors were used, either with a Silicon sensor ($450 \mu$m thickness, $\mu=10.4 cm^{-1}$) or a
-Cadmium-Telluride sensor ($750 \mu$m thickness, $\mu=125.4 cm^{-1}$).
-The simple replacement of the sensor is of course not possible in such detector and we used two different detectors.
-In order to avoid any artefact originating from the calibration, the plot of the figure \ref{fig:Si-CdTe} contains actually only the
-signal of the colon of pixels where the direct-beam hits the detector.
+In figure \ref{fig:Si-CdTe}, the diffraction patterns of $\rm CeO_2$ and Si powders were collected on the D2AM beamline (ESRF-BM02) with a monochromatic beam at 20 keV.
+Eiger2 \cite{Eiger} 4 mega-pixel detectors were used, either with a silicon sensor ($450 \mu$m thickness, $\mu=10.4\ \rm cm^{-1}$) or a
+cadmium telluride sensor ($750 \mu$m thickness, $\mu=125.4\ \rm cm^{-1}$).
+The simple replacement of the sensor is of course not possible in such a detector, so two different detectors were used.
+In order to avoid any artefact originating from the calibration, the plot in figure \ref{fig:Si-CdTe} actually contains only the
+signal of the column of pixels where the direct beam hits the detector.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{images/parallax/parallax_effect.png}
+    % TODO: add images/parallax/parallax_effect.png (not yet in the repository)
+    \IfFileExists{images/parallax/parallax_effect.png}%
+        {\includegraphics[width=0.8\textwidth]{images/parallax/parallax_effect.png}}%
+        {\fbox{Missing figure: images/parallax/parallax\_effect.png}}
     \caption{Parallax effect}
     \label{fig:Si-CdTe}
 \end{figure}
 
 
-In this paper we first describe the various attempts to address the parallax effect, most of them are operating in 1-dimentional space, i.e. after azimuthal integration of the diffraction frame.
+In this paper we first describe the various attempts to address the parallax effect, most of them operating in one-dimensional space, i.e. after azimuthal integration of the diffraction frame.
 Other approaches consist in ensuring photons arrive in the sensitive layer orthogonally, either by using cylindrical, spherical or multiple modules aligned along a circle.
 
-The third chapter presents the physics of volumetric photon absorption which is used to simulate the effect of Beer-Lambert's law with ray-tracing.
-This simulation can be stored into a sparse matrix representing the shift and blurring effect of the parallax. Once calculated, this sparse matrix can not only be used to blur a synthetic diffraction image, but also to "deconvolve" an actual image using inverse methods.
+The third section presents the physics of volumetric photon absorption which is used to simulate the effect of the Beer--Lambert law with ray-tracing.
+This simulation can be stored in a sparse matrix representing the shift and blurring effect of the parallax. Once calculated, this sparse matrix can not only be used to blur a synthetic diffraction image, but also to ``deconvolve'' an actual image using inverse methods.
 
-In the fourth chapter, we introduce the averaged parallax effect which copes for the displacement of rings. In the fifth chapter, the usage of this correction is discussed with its limitation.
+In the fourth section, we introduce the averaged parallax effect which compensates for the displacement of the rings. In the fifth section, the usage of this correction is discussed together with its limitations.
 
 \section{State of the art}
-The parallax effect is known for a long time, since this effect is proportionnal to the
-sensitive layer thickness and detector were using ionization gaz chambers (several centimeters in size)
-before the avent of CCD detectors coupled with phosphor or scintillators, much thinner.
+The parallax effect has been known for a long time, since this effect is proportional to the
+sensitive-layer thickness and detectors were based on ionization gas chambers (several centimetres in size)
+before the advent of CCD detectors coupled with phosphors or scintillators, which are much thinner.
 
      \subsection{Ensure the detector is locally orthogonal to the incident beam}
 
-The first attempts to address parallax were by ensuring photons enter the sensitive layer orthogonally.
-This can be achieved by manufacturing detectors that are spherical \cite{spherical_detector},
-planispherical \cite{planispherical} where the sample is located at the center of the sphere.
+The first attempts to address parallax consisted in ensuring that photons enter the sensitive layer orthogonally.
+This can be achieved by manufacturing detectors that are spherical \cite{spherical_detector} or
+planispherical \cite{planispherical}, where the sample is located at the centre of the sphere.
 Another approach is to use a cylindrical detector \cite{cylindrical_detector} where the sample is
-located at the center of the cylinder.
+located at the centre of the cylinder.
 In this configuration, the parallax is accounted for only in one direction, not the other.
-Finally this effect can also be mitigated by using several smaller detector assembled in
-arrays (Pilatus 12M Diamond), or by rotating one or several detectors on a $2\theta$ arm \cite{multi-detector}.
+Finally, this effect can also be mitigated by using several smaller detectors assembled in
+arrays (Pilatus 12M, Diamond), or by rotating one or several detectors on a $2\theta$ arm \cite{multi-detector}.
 
-Those methods suffer all from the same weakness, that the sample needs to be precisely located
-at the center of the detector geometry and any deviation may be difficult to account for.
+These methods all suffer from the same weakness: the sample needs to be precisely located
+at the centre of the detector geometry, and any deviation may be difficult to account for.
 
-     \subsection{Correct the powder diffraction pattern \textit{aposteriori}}
-A simple post-integration data corrections has been proposed to restore the actual
+     \subsection{Correct the powder diffraction pattern \textit{a posteriori}}
+A simple post-integration data correction has been proposed to restore the actual
 scattering angle by applying a polynomial correction to the expected scattering angle
 \cite{parallax_polynomial}, possibly coupled with a re-binning of the data to ensure the
-$2\theta-$ or q-positions are evenly spaced.
+$2\theta$- or $q$-positions are evenly spaced.
 This rebinning creates an extra blurring of the signal.
-The main drawback of the approach is that it requires the detector, supposingly flat,
-to be mounted orthogonally to the incident beam, which is limiting the accessible q-range.
+The main drawback of the approach is that it requires the detector, assumed to be flat,
+to be mounted orthogonally to the incident beam, which limits the accessible $q$-range.
 
      \subsection{Neural network based corrections}
-There is a ParallaxNet \cite{ParallaxNet} autoencoder designed to address the parallax effect
-but this autoencoder has been trained to address the variation of the sample - detector distance
-duing a diffraction tomography experiment.
+ParallaxNet \cite{ParallaxNet} is an autoencoder designed to address the parallax effect,
+but it has been trained to address the variation of the sample--detector distance
+during a diffraction tomography experiment.
 
-That said, the principle could be re-used to take the powder diffraction pattern from a
+That said, the principle could be re-used to take the powder diffraction patterns from a
 database like \textsc{simpod} \cite{simpod} and apply the parallax effect as described
 in section \ref{blur}.
-The ensemble of blurred patterns + theoretical patterns could be used to train a convolutionnal
+The ensemble of blurred and theoretical patterns could be used to train a convolutional
 neural network to perform the unblurring of diffraction images.
 
 \section{Physics of the parallax effect}
      \subsection{Beer-Lambert Law}
-The Beer-Lambert law describes the attenuation of light as it passes through matter:
-$$ dI = -\mu I dx$$
+The Beer--Lambert law describes the attenuation of light as it passes through matter:
+\begin{equation}
+\label{eq:beer-lambert}
+dI = -\mu I dx
+\end{equation}
 where $\mu$ is the linear attenuation coefficient and $x$ is the path length.
-It is more known under its integrated form, showing an exponential attenuation of light intensity:
-$$ I = I_0 e^{-\mu x}$$
+It is better known in its integrated form, showing an exponential attenuation of the light intensity:
+\begin{equation}
+\label{eq:beer-lambert-integrated}
+I = I_0 e^{-\mu x}
+\end{equation}
 In X-ray area detectors with thick sensitive layers, this law governs the probability of photon
 interaction at different depths within the detector material.
      \subsection{Simulation of the parallax effect using raytracing}
-Raytracing is an old computer vision problem which has been efficiently solved in \citein{raytracing}.
+Raytracing is an old computer vision problem which has been efficiently solved by \cite{raytracing}.
 The implementation in pyFAI is a direct re-implementation of this seminal work.
           \subsubsection{Implementation of raytracing in pyFAI}
-The software library pyFAI contains a module which performs raytracing, throwing
-several rays per pixel in the detector and measuring for each ray, how long the
-trajectory is in each volumetric pixel (voxel?).
+The software library pyFAI contains a module which performs raytracing, casting
+several rays per pixel of the detector and measuring, for each ray, the length of the
+trajectory in each volumetric pixel (voxel).
 
-Subsequently, the Beer-Lambert law is applied to descide how much energy is deposited in
+Subsequently, the Beer--Lambert law is applied to decide how much energy is deposited in
 each voxel.
 
-All rays thown in a pixel are averaged together and the result is stored in a sparse matrix
-where one pixel in the input image contributes to several pixel in the output image.
+All rays cast in a pixel are averaged together and the result is stored in a sparse matrix
+where one pixel in the input image contributes to several pixels in the output image.
 
 \begin{verbatim}
      import numpy
@@ -230,14 +252,14 @@ where one pixel in the input image contributes to several pixel in the output im
 
 In this example, the \textit{geometry.poni} file contains the detector position and description,
 including the sensor material and thickness.
-It is the typical \textsc{poni}-file produced by the \textit{pyFAI-calib2} application where
-all sensor material and thicknesses for all known detectors have been tabulated (~200 detectors).
+It is the typical \textsc{poni}-file produced by the \textit{pyFAI-calib2} application, where
+the sensor materials and thicknesses of all known detectors have been tabulated ($\sim$200 detectors).
 
      \subsection{Blurring of a synthetic powder diffraction frame}
 \label{blur}
 
      \subsection{Correction of the parallax effect}
-     Correction by deconvolution (RL, MLEM, ...)}
+     Correction by deconvolution (RL, MLEM, ...)
           \subsubsection{Theory behind deconvolution}
           \subsubsection{Deconvolution of synthetic data}
           \subsubsection{Deconvolution of real data}
@@ -246,12 +268,12 @@ all sensor material and thicknesses for all known detectors have been tabulated 
      \subsection{Calculation of the displacement}
      \subsection{Correction of the displacement}
      \subsection{Application to synthetic data}
-     \subsection{Application to experimental data (LaB6 on CdTe & Si detectors)}
+     \subsection{Application to experimental data ($\rm LaB_6$ on CdTe \& Si detectors)}
 
 \section{Discussion}
      \subsection{Usage in pyFAI}
      \subsection{Limitations of the average model}
-Detector thickness is only one term of peak broadening: sample height, width, pixel size, beam divergence, and wavelength dispersion are important too and not taken into account.
+The detector thickness is only one contribution to peak broadening: sample height and width, pixel size, beam divergence and wavelength dispersion are also important and are not taken into account.
      \subsection{Application to powder diffraction and PDF measurement}
 
 \section{Conclusion}
@@ -262,14 +284,12 @@ Detector thickness is only one term of peak broadening: sample height, width, pi
 
      % Acknowledgements come after the appendices
 
-\ack{Acknowledgments:}
-
-The authors would like to thank the staff of the D2AM beamline at the ESRF-BM02, especially Nils Blanc,
+\ack{The authors would like to thank the staff of the D2AM beamline (ESRF-BM02), especially Nils Blanc,
 for the opportunity to collect diffraction data with two detectors differing only by their sensor material.
-We would like to thanks all the people who encouraged us on the path, especially Marie Ruat and Paul-Antoine Douissard from the detector group
-at ESRF and the staff of the ID11 beamline at the ESRF for sharing their data.
-This work would not have been possible without the fruitful discussions with Veijo Honkimaki (ESRF), Vadim Diadkin and Dmitry Chernyshov (SNBL).
-Finally, we would like to thank Vincent Favre-Nicolin, head of the ADA-group and coordinator of the scattering bridge for support all along this project.
+We would like to thank all the people who encouraged us along the way, especially Marie Ruat and Paul-Antoine Douissard from the detector group
+at the ESRF, and the staff of the ID11 beamline at the ESRF for sharing their data.
+This work would not have been possible without fruitful discussions with Veijo Honkimaki (ESRF), Vadim Diadkin and Dmitry Chernyshov (SNBL).
+Finally, we would like to thank Vincent Favre-Nicolin, head of the ADA group and coordinator of the scattering bridge, for his support all along this project.}
 
 
 \bibliographystyle{iucr}
