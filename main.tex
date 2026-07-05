@@ -253,7 +253,7 @@ where one pixel in the input image contributes to several pixels in the output i
 In this example, the \textit{geometry.poni} file contains the detector position and description,
 including the sensor material and thickness.
 It is the typical \textsc{poni}-file produced by the \textit{pyFAI-calib2} application, where
-the sensor materials and thicknesses of all known detectors have been tabulated ($\sim$200 detectors).
+the sensor materials and thicknesses of all known detectors have been tabulated ($\sim$300 detectors).
 
      \subsection{Blurring of a synthetic powder diffraction frame}
 \label{blur}
@@ -315,15 +315,6 @@ description of the experimental setup: the incidence angle of the ray, the linea
 attenuation coefficient of the sensor material at the given photon energy and the
 sensor thickness.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/parallax/pyfai_calib2_parallax.png}
-    \caption{Experiment-settings tab of the \textit{pyFAI-calib2} graphical user interface.
-    The sensor material and thickness (here Si, $450\ \mu$m) are displayed in the
-    detector description, and the \textit{Plx} button activates the parallax correction
-    described in section \ref{sec:displacement}.}
-    \label{fig:calib2-parallax}
-\end{figure}
 
 It is worth noting that if the sensor is assumed to be infinitely thick
 ($t \rightarrow \infty$), the same integral leads to the simpler expression:
@@ -331,7 +322,7 @@ It is worth noting that if the sensor is assumed to be infinitely thick
 \label{eq:thick-sensor}
 \langle x \rangle = \frac{\sin(\alpha)}{\mu}
 \end{equation}
-an equation which is already available in \cite{resolution_function}.
+an equation which is already available in \citeasnoun{resolution_function}.
 
      \subsection{Correction of the displacement}
 The correction consists in shifting the position of every pixel by the average
@@ -348,6 +339,16 @@ angles calculated after correction.
 The sensor material and thickness are part of the detector description in pyFAI,
 and the correction can be activated directly from the \textit{pyFAI-calib2} graphical
 user interface, as shown in figure \ref{fig:calib2-parallax}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/parallax/pyfai_calib2_parallax.png}
+    \caption{Experiment-settings tab of the \textit{pyFAI-calib2} graphical user interface.
+    The sensor material and thickness (here Si, $450\ \mu$m) are displayed in the
+    detector description, and the \textit{Plx} button activates the parallax correction
+    described in section \ref{sec:displacement}.}
+    \label{fig:calib2-parallax}
+\end{figure}
 
      \subsection{Limitations of the average model}
 The detector thickness is only one contribution to peak broadening: sample height and width, pixel size, beam divergence and wavelength dispersion are also important and are not taken into account.
