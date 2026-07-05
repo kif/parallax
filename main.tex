@@ -24,6 +24,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
+\usepackage{url}
 
 \begin{document}                  % DO NOT DELETE THIS LINE
 
@@ -137,25 +138,31 @@ The parallax effect has three main consequences on the obtained powder diffracti
      \item Peak profile distortions which are likely to jeopardize Rietveld refinements
 \end{itemize}
 
-Figure 1: Volumetric absorption of photons
+% TODO: add a sketch figure of the volumetric absorption of photons
 
 \subsection{Visualization of the parallax effect}
 Since the parallax effect depends on the sensor of the detector, it is possible to visualize the effect
 by taking the same diffraction frame with two detectors differing only by their sensor material.
-In figure \ref{fig:Si-CdTe}, the diffraction patterns of $\rm CeO_2$ and Si powders were collected on the D2AM beamline (ESRF-BM02) with a monochromatic beam at 20 keV.
-Eiger2 \cite{Eiger} 4 mega-pixel detectors were used, either with a silicon sensor ($450 \mu$m thickness, $\mu=10.4\ \rm cm^{-1}$) or a
-cadmium telluride sensor ($750 \mu$m thickness, $\mu=125.4\ \rm cm^{-1}$).
+In figure \ref{fig:Si-CdTe}, the diffraction patterns of silicon (SRM640) and $\rm CeO_2$ (SRM674) powders were collected on the D2AM beamline (ESRF-BM02) with a monochromatic beam at 25 keV.
+Eiger2 \cite{Eiger} 4 mega-pixel detectors were used, either with a silicon sensor ($450 \mu$m thickness, $\mu=6.87\ \rm cm^{-1}$, detection efficiency $\eta=27\%$) or a
+cadmium telluride sensor ($750 \mu$m thickness, $\mu=75\ \rm cm^{-1}$, $\eta=99\%$).
 The simple replacement of the sensor is of course not possible in such a detector, so two different detectors were used.
 In order to avoid any artefact originating from the calibration, the plot in figure \ref{fig:Si-CdTe} actually contains only the
 signal of the column of pixels where the direct beam hits the detector.
+To compensate for the difference in detection efficiency, the signal of the silicon
+sensor has been multiplied by 3.7 so that the intensities of the two detectors are
+comparable.
 
 \begin{figure}
     \centering
-    % TODO: add images/parallax/parallax_effect.png (not yet in the repository)
-    \IfFileExists{images/parallax/parallax_effect.png}%
-        {\includegraphics[width=0.8\textwidth]{images/parallax/parallax_effect.png}}%
-        {\fbox{Missing figure: images/parallax/parallax\_effect.png}}
-    \caption{Parallax effect}
+    \includegraphics[width=0.9\textwidth]{images/parallax/parallax_effect.png}
+    \caption{Comparison of the signal recorded with the Si ($450\ \mu$m) and CdTe
+    ($750\ \mu$m) sensors for the powder diffraction of silicon (SRM640) at 25 keV:
+    intensity along the column of pixels passing through the direct beam, as a function
+    of the distance to the beam centre.
+    The signal of the Si sensor is multiplied by 3.7 to make the intensities comparable.
+    The diffraction peaks close to the beam centre superimpose, whereas the peaks
+    recorded by the Si sensor at larger angles are displaced.}
     \label{fig:Si-CdTe}
 \end{figure}
 
@@ -226,6 +233,7 @@ interaction at different depths within the detector material.
 Raytracing is an old computer vision problem which has been efficiently solved by \cite{raytracing}.
 The implementation in pyFAI is a direct re-implementation of this seminal work.
           \subsubsection{Implementation of raytracing in pyFAI}
+          \label{sec:raytracing}
 The software library pyFAI contains a module which performs raytracing, casting
 several rays per pixel of the detector and measuring, for each ray, the length of the
 trajectory in each volumetric pixel (voxel).
@@ -257,12 +265,34 @@ the sensor materials and thicknesses of all known detectors have been tabulated 
 
      \subsection{Blurring of a synthetic powder diffraction frame}
 \label{blur}
+The \texttt{sparse} matrix obtained in section \ref{sec:raytracing} describes the
+contribution of every input pixel to the output pixels.
+Applying the parallax effect to a synthetic image, i.e. blurring it, therefore reduces
+to a simple multiplication of this matrix with the image, considered as a vector:
+
+\begin{verbatim}
+     fake_parallax = sparse.dot(fake_img.ravel()).reshape(fake_img.shape)
+\end{verbatim}
+
+Here \texttt{fake\_img} is a synthetic powder diffraction frame: the \texttt{ravel()}
+method flattens the 2D image into a vector, which is multiplied by the sparse matrix,
+and the result is reshaped back to the original image shape.
 
      \subsection{Correction of the parallax effect}
-     Correction by deconvolution (RL, MLEM, ...)
-          \subsubsection{Theory behind deconvolution}
-          \subsubsection{Deconvolution of synthetic data}
-          \subsubsection{Deconvolution of real data}
+     \label{sec:deconvolution}
+The \texttt{sparse} matrix used previously would, theoretically, also allow the
+correction of an image suffering from the parallax effect: since the blurred image is
+the product of this matrix with the ideal image, recovering the latter is a
+deconvolution problem which can be addressed with pseudo-inversion tools, such as
+Tikhonov regularization, iterative least-squares solvers like LSMR, or
+maximum-likelihood expectation maximization (MLEM) for Poissonian data.
+This deconvolution is, however, mathematically ill-posed: the solution is highly
+sensitive to the noise present in the measured image.
+Inverse methods are an active field of research in mathematics, and the methods tested
+here (LSMR, MLEM) all turned out to be slow, requiring tens of seconds of computation
+per image, and introduced artefacts in the corrected images.
+These investigations are available in the pyFAI documentation at
+\url{https://www.silx.org/doc/pyFAI/2025.12/usage/tutorial/ThickDetector/deconvolution.html}.
 
 \section{Average parallax effect}
      \subsection{Calculation of the displacement}
@@ -332,6 +362,29 @@ In pyFAI, this correction is obtained by linear interpolation from the scatterin
 angles calculated after correction.
 
      \subsection{Application to synthetic data}
+     \label{sec:synthetic}
+Figure \ref{fig:synthetic-correction} illustrates the correction on a synthetic powder
+diffraction frame, azimuthally integrated (left panel) and zoomed on a single peak
+(right panel).
+The blue curve corresponds to the image generated from the crystallographic information
+of the calibrant (Si).
+The orange curve corresponds to the azimuthal integration of this image: the peak
+remains well centred on the theoretical position.
+The green curve corresponds to the application of the parallax effect (section
+\ref{blur}), which displaces the peak towards higher scattering angles.
+Finally, the red curve corresponds to the correction described in section
+\ref{sec:displacement}: the maximum of the peak is back at the theoretical position,
+but the broadening induced by the parallax remains present.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/parallax/synthetic_correction.png}
+    \caption{Effect of the parallax correction on a synthetic powder diffraction frame
+    of the silicon calibrant: azimuthal integration (left) and zoom on a single peak
+    (right). The dashed vertical lines indicate the theoretical peak positions.}
+    \label{fig:synthetic-correction}
+\end{figure}
+
      \subsection{Application to experimental data ($\rm LaB_6$ on CdTe \& Si detectors)}
 
 \section{Discussion}
@@ -351,10 +404,53 @@ user interface, as shown in figure \ref{fig:calib2-parallax}.
 \end{figure}
 
      \subsection{Limitations of the average model}
+Although the peak is now located at the proper position, the peak broadening caused by
+the parallax effect cannot be corrected without the use of an inverse method
+(see section \ref{sec:deconvolution}).
 The detector thickness is only one contribution to peak broadening: sample height and width, pixel size, beam divergence and wavelength dispersion are also important and are not taken into account.
      \subsection{Application to powder diffraction and PDF measurement}
+This new method of taking the parallax into account makes it possible to tilt the
+detector in order to increase the accessible diffraction angles without further
+distorting the peak shapes.
+Indeed, until now the parallax effect has mostly been taken into account within
+(Rietveld) refinements, which require all diffraction angles to share the same
+incidence angle on the detector, hence a detector mounted orthogonally to the incident
+beam.
+This constraint greatly limits the usability for PDF analysis.
+With this correction applied at the azimuthal-integration stage, the peaks are still
+broadened by the parallax, but less than if the different pixels contributing to the
+same peak had different incidence angles.
 
 \section{Conclusion}
+The parallax effect, i.e. the volumetric absorption of photons within the thickness of
+the sensor, displaces and broadens the diffraction peaks recorded with 2D area
+detectors, degrading the quality of geometry calibrations and of the extracted
+diffraction data at scattering angles beyond $30$°.
+
+Two complementary approaches to cope with this effect, both implemented in the pyFAI
+library, have been presented.
+On the one hand, ray tracing through the sensor volume, driven by the Beer--Lambert
+law, models the effect as a sparse matrix which allows the blurring of synthetic
+diffraction images.
+The pseudo-inversion of this matrix can in principle restore the unperturbed image, but
+the problem is mathematically ill-posed: the inverse methods tested require tens of
+seconds of computation per image and introduce artefacts in the corrected images.
+On the other hand, an analytical expression of the average displacement was derived.
+It depends only on the incidence angle of the ray, the linear attenuation coefficient
+of the sensor material and the sensor thickness, all of which are available in the
+geometry description of the experimental setup.
+Applied at the azimuthal-integration stage as a correction of the pixel positions, it
+restores the peak maxima to their theoretical positions regardless of the detector
+position and orientation, at a negligible computational cost; only the
+parallax-induced broadening of the peaks remains.
+
+This correction, integrated in the geometry engine of pyFAI and directly activatable
+from the \textit{pyFAI-calib2} graphical user interface, relaxes the constraint of
+mounting the detector orthogonally to the incident beam.
+It thereby opens the way to tilted-detector geometries which extend the accessible
+$q$-range, an asset for powder diffraction and especially for pair distribution
+function analysis, where thick, high-efficiency sensors and high scattering angles are
+both required.
 
      %-------------------------------------------------------------------------
      % The back matter of the paper - acknowledgements and references
