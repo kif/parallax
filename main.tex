@@ -94,8 +94,7 @@ The parallax effect in X-ray area detectors arises when X-rays emitted from a po
 traverse a thick sensitive layer, causing a shift in the apparent position of the detected events.
 This shift displaces and broadens the diffraction peaks, which degrades the angular resolution
 and introduces artefacts, especially in powder diffraction and pair distribution function (PDF) measurements.
-In thick sensors, X-rays with incidence angles above 30$^\circ$ may cross several pixels, leading to discrepancies
-between observed and expected scattering angles ($2\theta$).
+This becomes especially apparent in thick sensors, where X-rays with incidence angles (> 30$^\circ$) may cross several pixels, leading to discrepancies between observed and expected scattering angles ($2\theta$) for a given peak.
 In this contribution, the parallax effect is simulated by ray tracing based on the Beer--Lambert law and validated on synthetic data.
 Several correction strategies are compared, in particular a new integral method, implemented in the pyFAI library,
 which corrects the pixel positions regardless of the detector position and orientation.
@@ -114,10 +113,8 @@ or a $750\ \mu$m cadmium telluride sensor.
 
 \section{Introduction}
 
-Experimental setups are usually calibrated at synchrotron sources using the diffraction pattern of a properly
-characterized powder sample (by NIST, typically $\rm LaB_6, CeO_2$, ...).
-Those samples show well-defined concentric Debye--Scherrer rings in their diffraction pattern that are analyzed with tools such
-as pyFAI-calib2 \cite{pyfai_2020}, Dawn \cite{dawn} or GSAS-II \cite{GSAS-II}.
+Experimental setups are usually calibrated at synchrotron sources using the diffraction pattern of a reference material, a properly characterized powder sample (provided by NIST, typically $\rm LaB_6, CeO_2$, ...).
+Those samples show well-defined concentric Debye--Scherrer rings in their diffraction images that are analyzed with tools such as pyFAI-calib2 \cite{pyfai_2020}, Dawn \cite{dawn} or GSAS-II \cite{GSAS-II}.
 These tools assign the observed rings to the \textit{d-}spacings of the families of Miller planes and refine the geometry model, which is based on Bragg's law:
 \begin{equation}
 \label{eq:bragg}
@@ -128,17 +125,23 @@ Best calibrations are obtained when using as many rings and as many control poin
 rings as possible.
 Nevertheless, the quality of this fit has proven to degrade when including rings with
 $2\theta>30$° into the calibration.
-This effect is associated with volumetric absorption of X-ray photons in the sensitive
+This degradation is associated with volumetric absorption of X-ray photons in the sensitive
 layer of the detector, simply referred to as the parallax effect in the rest of the document.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/ActaCrystA/figure6.png}
+    \caption{Top left: detector in orthogonal geometry. Bottom left: illustration of convolution equation and the resulting line shape. Top right: azimuth–2$\theta$ map for $\rm LaB_6$ pattern measured at a sample-to-detector distance of 138~mm at 19.5~keV at SNBL beamline (ESRF). Bottom right: high-angle diffraction lines together with theoretical positions. There is no shift of the line position and no asymmetry for the lines at low angles. Vertical lines show the expected positions of the diffraction peaks. The data were processed by pyFAI-calib2. Figure reused with permission from \citeasnoun{resolution_function}.}
+
+    \label{fig:peak_profile}
+\end{figure}
 
 The parallax effect has three main consequences on the obtained powder diffraction pattern:
 \begin{itemize}
-     \item Peak broadening
-     \item Peak asymmetry (the peak maximum is usually close to the lowest $2\theta$ values)
-     \item Peak profile distortions which are likely to jeopardize Rietveld refinements
+     \item Peak broadening, increasing with the incidence angle.
+     \item Peak asymmetry (the peak maximum is close to the low scattering angles)
+     \item Peak profile distortions which are likely to jeopardize Rietveld refinements.
 \end{itemize}
-
-% TODO: add a sketch figure of the volumetric absorption of photons
 
 \subsection{Visualization of the parallax effect}
 Since the parallax effect depends on the sensor of the detector, it is possible to visualize the effect
