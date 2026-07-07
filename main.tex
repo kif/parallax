@@ -158,11 +158,11 @@ comparable.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\textwidth]{images/parallax/parallax_effect.png}
+    \includegraphics[width=0.9\textwidth]{images/parallax/fig2_comparison.png}
     \caption{Comparison of the signal recorded with the Si ($450\ \mu$m) and CdTe
     ($750\ \mu$m) sensors for the powder diffraction of silicon (SRM640) at 25 keV:
-    intensity along the column of pixels passing through the direct beam, as a function
-    of the distance to the beam centre.
+    intensity along the column of pixels passing through the direct beam (green line), 
+    as a function of the distance to the beam centre.
     The signal of the Si sensor is multiplied by 3.7 to make the intensities comparable.
     The diffraction peaks close to the beam centre superimpose, whereas the peaks
     recorded by the Si sensor at larger angles are displaced.}
@@ -170,13 +170,11 @@ comparable.
 \end{figure}
 
 
-In this paper we first describe the various attempts to address the parallax effect, most of them operating in one-dimensional space, i.e. after azimuthal integration of the diffraction frame.
+In this contribution we first describe the various attempts to address the parallax effect, most of them operating in one-dimensional space, i.e. after azimuthal integration of the diffraction frame.
 Other approaches consist in ensuring photons arrive in the sensitive layer orthogonally, either by using cylindrical, spherical or multiple modules aligned along a circle.
-
-The third section presents the physics of volumetric photon absorption which is used to simulate the effect of the Beer--Lambert law with ray-tracing.
-This simulation can be stored in a sparse matrix representing the shift and blurring effect of the parallax. Once calculated, this sparse matrix can not only be used to blur a synthetic diffraction image, but also to ``deconvolve'' an actual image using inverse methods.
-
-In the fourth section, we introduce the averaged parallax effect which compensates for the displacement of the rings. In the fifth section, the usage of this correction is discussed together with its limitations.
+The third section presents the physics of volumetric photon absorption which is used to simulate the effect. 
+In the fourth section, we introduce the averaged parallax effect which compensates for the displacement of the rings. 
+In the fifth section, the usage of this correction is discussed together with its limitations.
 
 \section{State of the art}
 The parallax effect has been known for a long time, since this effect is proportional to the
@@ -204,14 +202,12 @@ scattering angle by applying a polynomial correction to the expected scattering 
 $2\theta$- or $q$-positions are evenly spaced.
 This rebinning creates an extra blurring of the signal.
 The main drawback of the approach is that it requires the detector, assumed to be flat,
-to be mounted orthogonally to the incident beam, which limits the accessible $q$-range.
+to be mounted orthogonally to the incident beam, which limits the accessible $q$-range in comparison wwith tilted detectors.
 
      \subsection{Neural network based corrections}
-ParallaxNet \cite{ParallaxNet} is an autoencoder designed to address the parallax effect,
-but it has been trained to address the variation of the sample--detector distance
-during a diffraction tomography experiment.
-
-That said, the principle could be re-used to take the powder diffraction patterns from a
+ParallaxNet \cite{ParallaxNet} is an autoencoder neural network designed to address the parallax effect, but it has been trained to address the variation of the sample--detector distance
+during a diffraction tomography experiment. 
+The principle could be re-used to take the powder diffraction patterns from a
 database like \textsc{simpod} \cite{simpod} and apply the parallax effect as described
 in section \ref{blur}.
 The ensemble of blurred and theoretical patterns could be used to train a convolutional
@@ -233,8 +229,8 @@ I = I_0 e^{-\mu x}
 In X-ray area detectors with thick sensitive layers, this law governs the probability of photon
 interaction at different depths within the detector material.
      \subsection{Simulation of the parallax effect using raytracing}
-Raytracing is an old computer vision problem which has been efficiently solved by \cite{raytracing}.
-The implementation in pyFAI is a direct re-implementation of this seminal work.
+Raytracing is an old computer vision problem which has been efficiently solved by \citeasnoun{raytracing}.
+The implementation in pyFAI is a direct re-implementation of this seminal work, using Cython-compiled extension for performances \cite{cython}.
           \subsubsection{Implementation of raytracing in pyFAI}
           \label{sec:raytracing}
 The software library pyFAI contains a module which performs raytracing, casting
@@ -244,9 +240,9 @@ trajectory in each volumetric pixel (voxel).
 Subsequently, the Beer--Lambert law is applied to decide how much energy is deposited in
 each voxel.
 
-All rays cast in a pixel are averaged together and the result is stored in a sparse matrix
+All rays cast in a pixel are averaged together and the result is stored in a sparse matrix, $\Phi$,
 where one pixel in the input image contributes to several pixels in the output image.
-
+Here is an example of the useage of this module:
 \begin{verbatim}
      import numpy
      from scipy.sparse import csc_array
@@ -262,7 +258,7 @@ where one pixel in the input image contributes to several pixels in the output i
 \end{verbatim}
 
 In this example, the \textit{geometry.poni} file contains the detector position and description,
-including the sensor material and thickness.
+including the sensor material, thickness and the wavelength used.
 It is the typical \textsc{poni}-file produced by the \textit{pyFAI-calib2} application, where
 the sensor materials and thicknesses of all known detectors have been tabulated ($\sim$300 detectors).
 
@@ -271,31 +267,42 @@ the sensor materials and thicknesses of all known detectors have been tabulated 
 The \texttt{sparse} matrix obtained in section \ref{sec:raytracing} describes the
 contribution of every input pixel to the output pixels.
 Applying the parallax effect to a synthetic image, i.e. blurring it, therefore reduces
-to a simple multiplication of this matrix with the image, considered as a vector:
-
+to a simple multiplication of this matrix $\Phi$ with the image $x$, considered as a vector:
+\begin{equation}
+\label{eq:blur}
+z = \Phi \cdot x
+\end{equation}
+Which in Python \cite{python} can be implemented like this:
 \begin{verbatim}
-     fake_parallax = sparse.dot(fake_img.ravel()).reshape(fake_img.shape)
+     parallax_image = sparse.dot(img.ravel()).reshape(img.shape)
 \end{verbatim}
 
-Here \texttt{fake\_img} is a synthetic powder diffraction frame: the \texttt{ravel()}
+Here \texttt{img} is a synthetic powder diffraction frame ($x$): the \texttt{ravel()}
 method flattens the 2D image into a vector, which is multiplied by the sparse matrix,
 and the result is reshaped back to the original image shape.
 
      \subsection{Correction of the parallax effect}
      \label{sec:deconvolution}
-The \texttt{sparse} matrix used previously would, theoretically, also allow the
-correction of an image suffering from the parallax effect: since the blurred image is
-the product of this matrix with the ideal image, recovering the latter is a
-deconvolution problem which can be addressed with pseudo-inversion tools, such as
-Tikhonov regularization, iterative least-squares solvers like LSMR, or
-maximum-likelihood expectation maximization (MLEM) for Poissonian data.
-This deconvolution is, however, mathematically ill-posed: the solution is highly
-sensitive to the noise present in the measured image.
+     
+The initial signal before the parallax effect could theoretically be retrieved by inverting the matrix $\Phi$. 
+Despite this matrix being square, it is not invertible, making this inversion an ill-posed problem \cite{hadamard} which can be addressed using inverse methods which try to solve this equation:
+
+\begin{equation}
+\label{eq:inv}
+\hat{x} = argmin_x | \Phi \cdot x - z| + \lambda R(x)
+\end{equation}
+
+Where the first term is the data-term and the second the regularization term with $\lambda$ the regularization parameter and $R$ the penalization function.
+This inversion of parallax is highly sensitive to the noise present in the measured image.
+
+Several  pseudo-inversion tools, such as
+Tikhonov regularization\cite{Tikhonov}, iterative least-squares solvers like LSMR\cite{LSMR}, or
+maximum-likelihood expectation maximization (MLEM) for Poissonian data\cite{MLEM} have been tested.
+These investigations are available in the pyFAI documentation at
+\url{https://www.silx.org/doc/pyFAI/2025.12/usage/tutorial/ThickDetector/deconvolution.html}.
 Inverse methods are an active field of research in mathematics, and the methods tested
 here (LSMR, MLEM) all turned out to be slow, requiring tens of seconds of computation
 per image, and introduced artefacts in the corrected images.
-These investigations are available in the pyFAI documentation at
-\url{https://www.silx.org/doc/pyFAI/2025.12/usage/tutorial/ThickDetector/deconvolution.html}.
 
 \section{Average parallax effect}
      \subsection{Calculation of the displacement}
