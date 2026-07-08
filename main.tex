@@ -375,7 +375,7 @@ The curve from formula  \ref{eq:mean-displacement} shows a remarkable similitude
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\textwidth]{images/parallax/schema.png}
+    \includegraphics[width=0.9\textwidth]{images/parallax/displacement.png}
     \caption{Average distance between the point of incidence and point of interaction as function of the incidence angle, in pixels (75~µm) for a 450~µm silicon sensor and a X-Ray beam of 13.45~keV. The orange curve is this contribution, the green curve from \citeasnoun{resolution_function} and the blue curve from the numerical convolution \cite{parallax_model}}
     \label{fig:displacement}
 \end{figure}
@@ -383,12 +383,12 @@ The curve from formula  \ref{eq:mean-displacement} shows a remarkable similitude
 
 
 It is worth noting that if the sensor is assumed to be infinitely thick
-($t \rightarrow \infty$), the same integral leads to the simpler expression:
+($t \rightarrow \infty$), the same integral leads to the simpler expression (\ref{eq:thick-sensor})
+which is already available from \citeasnoun{resolution_function} but without demonstration.
 \begin{equation}
 \label{eq:thick-sensor}
 \langle x \rangle = \frac{\sin(\alpha)}{\mu}
 \end{equation}
-an equation which is already available in \citeasnoun{resolution_function}.
 
      \subsection{Correction of the displacement}
 The correction consists in shifting the position of every pixel by the average
@@ -416,12 +416,11 @@ but the broadening induced by the parallax remains present.
     \centering
     \includegraphics[width=0.9\textwidth]{images/parallax/synthetic_correction.png}
     \caption{Effect of the parallax correction on a synthetic powder diffraction frame
-    of the silicon calibrant: azimuthal integration (left) and zoom on a single peak
-    (right). The dashed vertical lines indicate the theoretical peak positions.}
+    of the silicon calibrant with an Eiger2 4M detector at 25~keV: azimuthal integration (left) and zoom on a single peak at large incidence angle (right). The dashed vertical lines indicate the theoretical peak positions.}
     \label{fig:synthetic-correction}
 \end{figure}
 
-     \subsection{Application to experimental data ($\rm LaB_6$ on CdTe \& Si detectors)}
+     \subsection{Application to experimental data ($\rm CeO2$ on CdTe \& Si detectors)}
 
 \section{Discussion}
      \subsection{Usage in pyFAI}
@@ -494,10 +493,9 @@ both required.
 
      % Acknowledgements come after the appendices
 
-\ack{The authors would like to thank the staff of the D2AM beamline (ESRF-BM02), especially Nils Blanc,
+\ack{The authors would like to thank the staff of the D2AM beamline (ESRF-BM02)
 for the opportunity to collect diffraction data with two detectors differing only by their sensor material.
-We would like to thank all the people who encouraged us along the way, especially Marie Ruat and Paul-Antoine Douissard from the detector group
-at the ESRF, and the staff of the ID11 beamline at the ESRF for sharing their data.
+We would like to thank all the people who encouraged us along the way, especially Marie Ruat and Paul-Antoine Douissard from the detector group at the ESRF, and the staff of the ID11 beamline at the ESRF for sharing their data.
 This work would not have been possible without fruitful discussions with Veijo Honkimaki (ESRF), Vadim Diadkin and Dmitry Chernyshov (SNBL).
 Finally, we would like to thank Vincent Favre-Nicolin, head of the ADA group and coordinator of the scattering bridge, for his support all along this project.}
 
