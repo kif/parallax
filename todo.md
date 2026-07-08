@@ -44,10 +44,8 @@ Points restants de la relecture (les corrections d'anglais, point A, ont été a
 - [x] **Kuster et al. (2025)** (clé `parallax-CDI`) — entrée mise à jour vers la version
   publiée (*J. Phys. Conf. Ser.* **3010**, 012135) et citée dans l'introduction le
   8 juillet 2026.
-- [ ] **Hammersley et al. (1994)** (clé `fit2d1994`, PDF dans `library/`) — pour appuyer
-  « The parallax effect has been known for a long time » (§2) : ce papier nomme
-  explicitement la parallaxe (fenêtre d'entrée des XRII) et fonde les corrections de
-  distorsion spatiale.
+- [x] **Hammersley et al. (1994)** (clé `fit2d1994`) — cité en tête de la section 2
+  pour appuyer « The parallax effect has been known for a long time » (8 juillet 2026).
 - [ ] **NumPy** (Harris et al., 2020, *Nature* **585**, 357–362) et **SciPy**
   (Virtanen et al., 2020, *Nature Methods* **17**, 261–272) — le code utilise `numpy`
   et `scipy.sparse` alors que Python et Cython sont déjà cités.
