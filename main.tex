@@ -219,6 +219,17 @@ in section \ref{blur}.
 The ensemble of blurred and theoretical patterns could be used to train a convolutional
 neural network to perform the unblurring of diffraction images.
 
+     \subsection{Analytical model of the average displacement}
+     \label{sec:analytical-model}
+The resolution function of powder diffraction setups based on area detectors has been
+described by \citeasnoun{resolution_function}, where the displacement caused by the
+parallax effect is modelled as $\sin(\alpha)/\mu$, with $\alpha$ the incidence angle of
+the ray on the detector and $\mu$ the linear attenuation coefficient of the sensor
+material.
+The main issue with this description is that it does not explain the increase of the
+parallax effect observed above $30^\circ$.
+This limitation is addressed in section \ref{sec:displacement}.
+
 \section{Physics of the parallax effect}
      \subsection{The Beer--Lambert law}
 The Beer--Lambert law describes the attenuation of light as it passes through matter:
@@ -273,17 +284,17 @@ the sensor materials and thicknesses of all known detectors have been tabulated 
 The \texttt{sparse} matrix obtained in section \ref{sec:raytracing} describes the
 contribution of every input pixel to the output pixels.
 Applying the parallax effect to a synthetic image, i.e. blurring it, therefore reduces
-to a simple multiplication of this matrix $\Phi$ with the image $x$, considered as a vector:
+to a simple multiplication of this matrix $\Phi$ with the raw image $r$, considered as a vector:
 \begin{equation}
 \label{eq:blur}
-y = \Phi \cdot x
+p = \Phi \cdot r
 \end{equation}
 which can be implemented in Python \cite{python} as:
 \begin{verbatim}
      parallax_image = sparse.dot(img.ravel()).reshape(img.shape)
 \end{verbatim}
 
-Here \texttt{img} is a synthetic powder diffraction frame ($x$): the \texttt{ravel()}
+Here \texttt{img} is a synthetic powder diffraction frame ($r$): the \texttt{ravel()}
 method flattens the 2D image into a vector, which is multiplied by the sparse matrix,
 and the result is reshaped back to the original image shape.
 
@@ -295,7 +306,7 @@ Despite this matrix being square, it is not invertible, making this inversion an
 
 \begin{equation}
 \label{eq:inv}
-\hat{x} = \operatorname{arg\,min}_x \left\| \Phi \cdot x - y \right\|^2 + \lambda R(x)
+\hat{r} = \operatorname{arg\,min}_r \left\| \Phi \cdot r - p \right\|^2 + \lambda R(r)
 \end{equation}
 
 where the first term is the data term and the second the regularization term, with $\lambda$ the regularization parameter and $R$ the penalty function.
@@ -391,7 +402,8 @@ The curve from equation \ref{eq:mean-displacement} shows a remarkable similarity
 
 It is worth noting that if the sensor is assumed to be infinitely thick
 ($t \rightarrow \infty$), the same integral leads to the simpler expression (\ref{eq:thick-sensor}),
-which was already given by \citeasnoun{resolution_function}, albeit without derivation.
+which was already given by \citeasnoun{resolution_function}, albeit without derivation
+(see section \ref{sec:analytical-model}).
 \begin{equation}
 \label{eq:thick-sensor}
 \langle x \rangle = \frac{\sin(\alpha)}{\mu}

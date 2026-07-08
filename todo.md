@@ -7,8 +7,9 @@ Points restants de la relecture (les corrections d'anglais, point A, ont été a
 - [x] **Figure 1 (`fig:peak_profile`) n'est jamais citée dans le texte** — renvoi ajouté
   le 8 juillet 2026 : « …three main consequences …, illustrated in figure
   \ref{fig:peak_profile}: ».
-- [x] **Collision de notation** `$z$` : image floutée renommée `$y$` dans `eq:blur` et
-  `eq:inv` (8 juillet 2026).
+- [x] **Collision de notation** `$z$` : notation finale choisie par Jérôme — image
+  brute $r$ (raw), image avec parallaxe $p$ (parallax) : $p = \Phi r$ et
+  $\hat{r} = \operatorname{arg\,min}_r \|\Phi r - p\|^2 + \lambda R(r)$ (8 juillet 2026).
 - [x] **Équation `eq:inv`** : `\operatorname{arg\,min}_x` et norme au carré (8 juillet 2026).
 - [x] Section 4.1 : « ($\delta x$) » orphelin supprimé (8 juillet 2026).
 - [x] Titre section 4.4 : `$\rm CeO_2$` corrigé (8 juillet 2026).
