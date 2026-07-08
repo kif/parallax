@@ -51,4 +51,6 @@ Points restants de la relecture (les corrections d'anglais, point A, ont été a
   auteurs (8 juillet 2026).
 - ~~Optionnel : **Dioptas** (Prescher & Prakapenka, 2015)~~ — écarté le 8 juillet 2026 :
   non pertinent car Dioptas se base sur pyFAI (pas une approche indépendante).
-- [ ] Optionnel : certificats **NIST** pour SRM640 et SRM674.
+- [x] Certificats **NIST** : SRM 640f cité via l'article de certification (Black et al.,
+  2020, *Powder Diffr.* **35**, 156–159) et SRM 674b via le certificat d'analyse NIST
+  (2012) — appliqué en §1.1 le 8 juillet 2026 (lots 640f/674b confirmés par Jérôme).
