@@ -300,8 +300,7 @@ Several  pseudo-inversion tools, such as
 Tikhonov regularization \cite{Tikhonov}, iterative least-squares solvers like LSMR \cite{LSMR}, or
 maximum-likelihood expectation maximization (MLEM) solver for Poissonian data 
 \cite{MLEM} have been tested.
-These investigations are available as part of the pyFAI documentation at
-\url{https://www.silx.org/doc/pyFAI/2025.12/usage/tutorial/ThickDetector/deconvolution.html}.
+These investigations are available as part of the pyFAI documentation \cite{deconvolution}.
 
 % if possible, insert here the overlap of peak displacement and peak width for 
 
@@ -309,7 +308,7 @@ Inverse methods are an active field of research in mathematics, and the methods 
 (LSMR and MLEM) all turned out to be slow (typically dozens of seconds processing per 4-Mpixel frame), and introduce artefacts in the corrected images. 
 Fewer artefacts were observed when using the MLEM algorithm.
 
-The usage of inverse methods is practically not feasible due to its computational requirements, neither is the approach proposed in \citeasnoun{resolution_function} which requires a precise description of the sample and beam-shape as described in pyFAI's documentation at \url{https://www.silx.org/doc/pyFAI/2026.5/usage/tutorial/ThickDetector/Parallax_model.html}.
+The usage of inverse methods is practically not feasible due to its computational requirements, neither is the approach proposed in \citeasnoun{resolution_function} which requires a precise description of the sample and beam-shape as implemented in pyFAI's documentation \cite{parallax_model}.
 We have thus searched for an another path which would applicable to address the parallax issue.
 
 \section{Average parallax effect}
@@ -360,7 +359,7 @@ which leads to:
 \label{eq:proba-normed}
 P(z) = \mu' \cdot \frac{e^{-\mu' z}}{1 - e^{-\mu' t}}
 \end{equation}
-After integration of equation \ref{eq:expectation} by parts, the average displacement becomes:
+After integration of equation \ref{eq:expectation}, the average displacement becomes:
 \begin{equation}
 \label{eq:mean-displacement}
 \langle x \rangle = \frac{\sin(\alpha)}{\mu} \cdot \frac{1 - (1 + \mu' t) \, e^{-\mu' t}}{1 - e^{-\mu' t}}
@@ -369,6 +368,18 @@ This average displacement depends only on quantities available in the geometry
 description of the experimental setup: the incidence angle of the ray, the linear
 attenuation coefficient of the sensor material at the given photon energy and the
 sensor thickness.
+
+The numerical value of this displacement can be compared with the simulation performed with 
+the convolution of a Gaussian-shaped beam profile with a truncated exponential decay in figure \ref{fig:displacement}. 
+The curve from formula  \ref{eq:mean-displacement} shows a remarkable similitude with the numerically integrated displacement from \citeasnoun{parallax_model}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/parallax/schema.png}
+    \caption{Average distance between the point of incidence and point of interaction as function of the incidence angle, in pixels (75~µm) for a 450~µm silicon sensor and a X-Ray beam of 13.45~keV. The orange curve is this contribution, the green curve from \citeasnoun{resolution_function} and the blue curve from the numerical convolution \cite{parallax_model}}
+    \label{fig:displacement}
+\end{figure}
+
 
 
 It is worth noting that if the sensor is assumed to be infinitely thick
