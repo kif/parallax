@@ -4,27 +4,22 @@ Points restants de la relecture (les corrections d'anglais, point A, ont été a
 
 ## B. Forme et cohérence
 
-- [ ] **Figure 1 (`fig:peak_profile`) n'est jamais citée dans le texte** — le journal exige
-  que les figures soient numérotées dans l'ordre de citation. Ajouter un renvoi, par
-  exemple ligne ~139 : « …three main consequences (figure \ref{fig:peak_profile}): ».
-- [ ] **Collision de notation** : `$z$` désigne à la fois l'image floutée
-  (équation `eq:blur`) et la profondeur dans le capteur (section 4.1). Renommer
-  l'image floutée `$y$` dans `eq:blur` et `eq:inv`.
-- [ ] **Équation `eq:inv`** : `argmin` en italique mathématique →
-  `\operatorname{arg\,min}_x` ; remplacer la valeur absolue par une norme,
-  typiquement au carré : `\hat{x} = \operatorname{arg\,min}_x \|\Phi x - z\|^2 + \lambda R(x)`.
-- [ ] Section 4.1 : « ($\delta x$) » introduit mais jamais réutilisé (le texte emploie
-  `$\langle x \rangle$`) — supprimer ou harmoniser.
-- [ ] Titre section 4.4 : `$\rm CeO2$` → `$\rm CeO_2$` (indice manquant).
+- [x] **Figure 1 (`fig:peak_profile`) n'est jamais citée dans le texte** — renvoi ajouté
+  le 8 juillet 2026 : « …three main consequences …, illustrated in figure
+  \ref{fig:peak_profile}: ».
+- [x] **Collision de notation** `$z$` : image floutée renommée `$y$` dans `eq:blur` et
+  `eq:inv` (8 juillet 2026).
+- [x] **Équation `eq:inv`** : `\operatorname{arg\,min}_x` et norme au carré (8 juillet 2026).
+- [x] Section 4.1 : « ($\delta x$) » orphelin supprimé (8 juillet 2026).
+- [x] Titre section 4.4 : `$\rm CeO_2$` corrigé (8 juillet 2026).
 - [ ] **Section 4.4 « Application to experimental data » encore vide** — à rédiger
   (données CeO₂ sur détecteurs Si/CdTe à D2AM).
-- [ ] Titre section 3.1 : « Beer-Lambert Law » → « The Beer--Lambert law »
-  (tiret demi-cadratin, minuscule à law).
-- [ ] Légende figure 2 (`fig:Si-CdTe`) : vérifier que `fig2_comparison.png` montre bien
-  une « green line » (sur le transparent 3, la ligne de coupe était jaune).
-- [ ] Micromètres : usage mixte `$450 \mu$m` / « µm » Unicode — uniformiser sur `$\mu$m`.
-- [ ] Harmoniser la casse de la clé de citation `\cite{Tikhonov}` vs `tikhonov` dans
-  `biblio.bib` (BibTeX est insensible à la casse, mais fragile si changement d'outil).
+- [x] Titre section 3.1 : « The Beer--Lambert law » (8 juillet 2026).
+- [x] Légende figure 2 (`fig:Si-CdTe`) : ligne verte vérifiée sur la nouvelle figure
+  composite ; légende réécrite (panneaux gauche/droite, axe en $2\theta$ et non plus en
+  distance) le 8 juillet 2026.
+- [x] Micromètres : uniformisés sur `$\mu$m` (plus de µ Unicode dans main.tex) (8 juillet 2026).
+- [x] Casse de `\cite{Tikhonov}` harmonisée en `\cite{tikhonov}` (8 juillet 2026).
 - [ ] Affiliation [b] encore « TBD » (Gudrun Lotze).
 - [ ] Abstract : ajouter un résultat quantitatif quand la section 4.4 sera écrite
   (exigence du journal : abstract « as quantitative as possible »).

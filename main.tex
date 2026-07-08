@@ -139,19 +139,20 @@ diffraction imaging \cite{parallax-CDI}.
     \label{fig:peak_profile}
 \end{figure}
 
-The parallax effect has three main consequences on the obtained powder diffraction pattern:
+The parallax effect has four main consequences on the obtained powder diffraction pattern, illustrated in figure \ref{fig:peak_profile}:
 \begin{itemize}
-     \item Peak broadening, increasing with the incidence angle.
-     \item Peak asymmetry (the peak maximum is shifted towards lower scattering angles).
-     \item Peak profile distortions which are likely to jeopardize Rietveld refinements.
+     \item Peak position shift, usually towards larger scattering angles.
+     \item Peak broadening, usually increasing with the incidence angle.
+     \item Peak asymmetry (the maximum lies at lower incidence angles).
+     \item Peak profile distortions, which are likely to jeopardize Rietveld refinements.
 \end{itemize}
 
 \subsection{Visualization of the parallax effect}
 Since the parallax effect depends on the detector sensor, it is possible to visualize the effect
 by recording the same diffraction frame with two detectors differing only by their sensor material.
 The diffraction patterns of silicon (SRM640) and $\rm CeO_2$ (SRM674) powders were collected on the D2AM beamline (ESRF-BM02) with a monochromatic beam at 25 keV and are compared in figure \ref{fig:Si-CdTe}.
-Eiger2 \cite{Eiger} 4 mega-pixel detectors were used, either with a silicon sensor ($450 \mu$m thickness, $\mu=6.87\ \rm cm^{-1}$, detection efficiency $\eta=27\%$) or a
-cadmium telluride sensor ($750 \mu$m thickness, $\mu=75\ \rm cm^{-1}$, $\eta=99\%$).
+Eiger2 \cite{Eiger} 4 mega-pixel detectors were used, either with a silicon sensor ($450\ \mu$m thickness, $\mu=6.87\ \rm cm^{-1}$, detection efficiency $\eta=27\%$) or a
+cadmium telluride sensor ($750\ \mu$m thickness, $\mu=75\ \rm cm^{-1}$, $\eta=99\%$).
 The simple replacement of the sensor is of course not possible in such a detector, so two different detectors were used.
 In order to avoid any artefact originating from the calibration, the plot in figure \ref{fig:Si-CdTe} actually contains only the
 signal of the column of pixels where the direct beam hits the detector.
@@ -163,19 +164,21 @@ comparable.
     \centering
     \includegraphics[width=0.9\textwidth]{images/parallax/fig2_comparison.png}
     \caption{Comparison of the signal recorded with the Si ($450\ \mu$m) and CdTe
-    ($750\ \mu$m) sensors for the powder diffraction of silicon (SRM640) at 25 keV:
-    intensity along the column of pixels passing through the direct beam (green line), 
-    as a function of the distance to the beam centre.
+    ($750\ \mu$m) sensors for the powder diffraction of silicon (SRM640) at 25 keV.
+    Left: diffraction images, with the column of pixels passing through the direct
+    beam marked by the green line.
+    Right: intensity along this column as a function of the scattering angle $2\theta$,
+    with zooms at low and high angles.
     The signal of the Si sensor is multiplied by 3.7 to make the intensities comparable.
-    The diffraction peaks close to the beam centre superimpose, whereas the peaks
-    recorded by the Si sensor at larger angles are displaced.}
+    The diffraction peaks at low angles superimpose, whereas the peaks recorded at
+    high angles are displaced.}
     \label{fig:Si-CdTe}
 \end{figure}
 
 
 In this contribution we first describe the various attempts to address the parallax effect, most of them operating in one-dimensional space, i.e. after azimuthal integration of the diffraction frame.
 Other approaches consist in ensuring photons arrive in the sensitive layer orthogonally, either by using cylindrical, spherical or multiple modules aligned along a circle.
-The third section presents the physics of volumetric photon absorption which is used to simulate the effect. 
+The third section presents the physics of volumetric photon absorption, which is used to simulate the effect.
 In the fourth section, we introduce the averaged parallax effect which compensates for the displacement of the rings. 
 In the fifth section, the usage of this correction is discussed together with its limitations.
 
@@ -217,7 +220,7 @@ The ensemble of blurred and theoretical patterns could be used to train a convol
 neural network to perform the unblurring of diffraction images.
 
 \section{Physics of the parallax effect}
-     \subsection{Beer-Lambert Law}
+     \subsection{The Beer--Lambert law}
 The Beer--Lambert law describes the attenuation of light as it passes through matter:
 \begin{equation}
 \label{eq:beer-lambert}
@@ -273,7 +276,7 @@ Applying the parallax effect to a synthetic image, i.e. blurring it, therefore r
 to a simple multiplication of this matrix $\Phi$ with the image $x$, considered as a vector:
 \begin{equation}
 \label{eq:blur}
-z = \Phi \cdot x
+y = \Phi \cdot x
 \end{equation}
 which can be implemented in Python \cite{python} as:
 \begin{verbatim}
@@ -288,21 +291,21 @@ and the result is reshaped back to the original image shape.
      \label{sec:deconvolution}
      
 The initial signal before the parallax effect could theoretically be retrieved by inverting the matrix $\Phi$. 
-Despite this matrix being square, it is not invertible, making this inversion an ill-posed problem \cite{hadamard} which can be addressed using inverse methods which try to solve this equation:
+Despite this matrix being square, it is not invertible, making this inversion an ill-posed problem \cite{hadamard}, which can be addressed using inverse methods that try to solve the following equation:
 
 \begin{equation}
 \label{eq:inv}
-\hat{x} = argmin_x | \Phi \cdot x - z| + \lambda R(x)
+\hat{x} = \operatorname{arg\,min}_x \left\| \Phi \cdot x - y \right\|^2 + \lambda R(x)
 \end{equation}
 
 where the first term is the data term and the second the regularization term, with $\lambda$ the regularization parameter and $R$ the penalty function.
-This inversion of parallax effect is highly sensitive to the noise present in the measured image,
-noise that is inevitable, notably the Poisson noise.
+This inversion of the parallax effect is highly sensitive to the noise present in the
+measured image, which is inevitable, notably Poisson noise.
 
 Several pseudo-inversion tools, such as
-Tikhonov regularization \cite{Tikhonov}, iterative least-squares solvers like LSMR \cite{LSMR}, or
-maximum-likelihood expectation maximization (MLEM) solver for Poissonian data 
-\cite{MLEM} have been tested.
+Tikhonov regularization \cite{tikhonov}, iterative least-squares solvers like LSMR \cite{LSMR}, or
+the maximum-likelihood expectation-maximization (MLEM) solver for Poissonian data
+\cite{MLEM}, have been tested.
 These investigations are available as part of the pyFAI documentation \cite{deconvolution}.
 
 % if possible, insert here the overlap of peak displacement and peak width for 
@@ -318,7 +321,7 @@ We have thus searched for another approach that would be applicable to the paral
      \subsection{Calculation of the displacement}
      \label{sec:displacement}
 
-The average displacement of the detected signal ($\delta x$) caused by the parallax effect
+The average displacement of the detected signal caused by the parallax effect
 can be calculated analytically for a flat sensor of thickness $t$ (figure \ref{fig:schema}).
 Let $\alpha$ be the incidence angle of the X-ray on the sensor, measured from the normal
 to its surface, $z$ the depth inside the sensor below the point of incidence (POI) and
@@ -372,8 +375,9 @@ description of the experimental setup: the incidence angle of the ray, the linea
 attenuation coefficient of the sensor material at the given photon energy and the
 sensor thickness.
 
-The numerical value of this displacement can be compared with the simulation performed with 
-the convolution of a Gaussian-shaped beam profile with a truncated exponential decay in figure \ref{fig:displacement}. 
+The numerical value of this displacement is compared in figure \ref{fig:displacement}
+with the simulation obtained by convolving a Gaussian-shaped beam profile with a
+truncated exponential decay.
 The curve from equation \ref{eq:mean-displacement} shows a remarkable similarity to the numerically integrated displacement from \citeasnoun{parallax_model}.
 
 \begin{figure}
@@ -423,7 +427,7 @@ but the broadening induced by the parallax remains present.
     \label{fig:synthetic-correction}
 \end{figure}
 
-     \subsection{Application to experimental data ($\rm CeO2$ on CdTe \& Si detectors)}
+     \subsection{Application to experimental data ($\rm CeO_2$ on CdTe \& Si detectors)}
 
 \section{Discussion}
      \subsection{Usage in pyFAI}
