@@ -293,26 +293,41 @@ Despite this matrix being square, it is not invertible, making this inversion an
 \end{equation}
 
 Where the first term is the data-term and the second the regularization term with $\lambda$ the regularization parameter and $R$ the penalization function.
-This inversion of parallax is highly sensitive to the noise present in the measured image.
+This inversion of parallax effect is highly sensitive to the noise present in the measured image,
+noise that is inevitable, notably the Poisson noise.
 
 Several  pseudo-inversion tools, such as
-Tikhonov regularization\cite{Tikhonov}, iterative least-squares solvers like LSMR\cite{LSMR}, or
-maximum-likelihood expectation maximization (MLEM) for Poissonian data\cite{MLEM} have been tested.
-These investigations are available in the pyFAI documentation at
+Tikhonov regularization \cite{Tikhonov}, iterative least-squares solvers like LSMR \cite{LSMR}, or
+maximum-likelihood expectation maximization (MLEM) solver for Poissonian data 
+\cite{MLEM} have been tested.
+These investigations are available as part of the pyFAI documentation at
 \url{https://www.silx.org/doc/pyFAI/2025.12/usage/tutorial/ThickDetector/deconvolution.html}.
+
+% if possible, insert here the overlap of peak displacement and peak width for 
+
 Inverse methods are an active field of research in mathematics, and the methods tested
-here (LSMR, MLEM) all turned out to be slow, requiring tens of seconds of computation
-per image, and introduced artefacts in the corrected images.
+(LSMR and MLEM) all turned out to be slow (typically dozens of seconds processing per 4-Mpixel frame), and introduce artefacts in the corrected images. 
+Fewer artefacts were observed when using the MLEM algorithm.
+
+The usage of inverse methods is practically not feasible due to its computational requirements, neither is the approach proposed in \citeasnoun{resolution_function} which requires a precise description of the sample and beam-shape as described in pyFAI's documentation at \url{https://www.silx.org/doc/pyFAI/2026.5/usage/tutorial/ThickDetector/Parallax_model.html}.
+We have thus searched for an another path which would applicable to address the parallax issue.
 
 \section{Average parallax effect}
      \subsection{Calculation of the displacement}
      \label{sec:displacement}
 
-The average displacement of the detected signal caused by the parallax effect can be
-calculated analytically for a flat sensor of thickness $t$.
+The average displacement of the detected signal ($\delta x$) caused by the parallax effect
+can be calculated analytically for a flat sensor of thickness $t$ (figure \ref{fig:schema}).
 Let $\alpha$ be the incidence angle of the X-ray on the sensor, measured from the normal
 to its surface, $z$ the depth inside the sensor below the point of incidence (POI) and
 $x$ the lateral position on the sensor surface, measured along the projection of the ray.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/parallax/schema.png}
+    \caption{Absorption in the volume of the sensor: axis definition.}
+    \label{fig:schema}
+\end{figure}
 
 The average displacement $\langle x \rangle$ of the deposited energy is the expectation
 value of the observable $x(z)$:
