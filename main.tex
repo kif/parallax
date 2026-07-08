@@ -94,7 +94,7 @@ The parallax effect in X-ray area detectors arises when X-rays emitted from a po
 traverse a thick sensitive layer, causing a shift in the apparent position of the detected events.
 This shift displaces and broadens the diffraction peaks, which degrades the angular resolution
 and introduces artefacts, especially in powder diffraction and pair distribution function (PDF) measurements.
-This becomes especially apparent in thick sensors, where X-rays with incidence angles (> 30$^\circ$) may cross several pixels, leading to discrepancies between observed and expected scattering angles ($2\theta$) for a given peak.
+This becomes especially apparent in thick sensors, where X-rays with incidence angles above 30$^\circ$ may cross several pixels, leading to discrepancies between observed and expected scattering angles ($2\theta$) for a given peak.
 In this contribution, the parallax effect is simulated by ray tracing based on the Beer--Lambert law and validated on synthetic data.
 Several correction strategies are compared, in particular a new integral method, implemented in the pyFAI library,
 which corrects the pixel positions regardless of the detector position and orientation.
@@ -113,18 +113,18 @@ or a $750\ \mu$m cadmium telluride sensor.
 
 \section{Introduction}
 
-Experimental setups are usually calibrated at synchrotron sources using the diffraction pattern of a reference material, a properly characterized powder sample (provided by NIST, typically $\rm LaB_6, CeO_2$, ...).
+Experimental setups are usually calibrated at synchrotron sources using the diffraction pattern of a reference material, a properly characterized powder sample (provided by NIST, such as $\rm LaB_6$ or $\rm CeO_2$).
 Those samples show well-defined concentric Debye--Scherrer rings in their diffraction images that are analyzed with tools such as pyFAI-calib2 \cite{pyfai_2020}, Dawn \cite{dawn} or GSAS-II \cite{GSAS-II}.
 These tools assign the observed rings to the \textit{d-}spacings of the families of Miller planes and refine the geometry model, which is based on Bragg's law:
 \begin{equation}
 \label{eq:bragg}
-2d \sin \left({\frac{2\theta}{2}}\right) = n \lambda
+2 d \sin(\theta) = n \lambda
 \end{equation}
 
 Best calibrations are obtained when using as many rings and as many control points per
-rings as possible.
+ring as possible.
 Nevertheless, the quality of this fit has proven to degrade when including rings with
-$2\theta>30$° into the calibration.
+$2\theta > 30^\circ$ into the calibration.
 This degradation is associated with volumetric absorption of X-ray photons in the sensitive
 layer of the detector, simply referred to as the parallax effect in the rest of the document.
 
@@ -139,14 +139,14 @@ layer of the detector, simply referred to as the parallax effect in the rest of 
 The parallax effect has three main consequences on the obtained powder diffraction pattern:
 \begin{itemize}
      \item Peak broadening, increasing with the incidence angle.
-     \item Peak asymmetry (the peak maximum is close to the low scattering angles)
+     \item Peak asymmetry (the peak maximum is shifted towards lower scattering angles).
      \item Peak profile distortions which are likely to jeopardize Rietveld refinements.
 \end{itemize}
 
 \subsection{Visualization of the parallax effect}
-Since the parallax effect depends on the sensor of the detector, it is possible to visualize the effect
-by taking the same diffraction frame with two detectors differing only by their sensor material.
-In figure \ref{fig:Si-CdTe}, the diffraction patterns of silicon (SRM640) and $\rm CeO_2$ (SRM674) powders were collected on the D2AM beamline (ESRF-BM02) with a monochromatic beam at 25 keV.
+Since the parallax effect depends on the detector sensor, it is possible to visualize the effect
+by recording the same diffraction frame with two detectors differing only by their sensor material.
+The diffraction patterns of silicon (SRM640) and $\rm CeO_2$ (SRM674) powders were collected on the D2AM beamline (ESRF-BM02) with a monochromatic beam at 25 keV and are compared in figure \ref{fig:Si-CdTe}.
 Eiger2 \cite{Eiger} 4 mega-pixel detectors were used, either with a silicon sensor ($450 \mu$m thickness, $\mu=6.87\ \rm cm^{-1}$, detection efficiency $\eta=27\%$) or a
 cadmium telluride sensor ($750 \mu$m thickness, $\mu=75\ \rm cm^{-1}$, $\eta=99\%$).
 The simple replacement of the sensor is of course not possible in such a detector, so two different detectors were used.
@@ -202,7 +202,7 @@ scattering angle by applying a polynomial correction to the expected scattering 
 $2\theta$- or $q$-positions are evenly spaced.
 This rebinning creates an extra blurring of the signal.
 The main drawback of the approach is that it requires the detector, assumed to be flat,
-to be mounted orthogonally to the incident beam, which limits the accessible $q$-range in comparison wwith tilted detectors.
+to be mounted orthogonally to the incident beam, which limits the accessible $q$-range in comparison with tilted detectors.
 
      \subsection{Neural network based corrections}
 ParallaxNet \cite{ParallaxNet} is an autoencoder neural network designed to address the parallax effect, but it has been trained to address the variation of the sample--detector distance
@@ -230,7 +230,7 @@ In X-ray area detectors with thick sensitive layers, this law governs the probab
 interaction at different depths within the detector material.
      \subsection{Simulation of the parallax effect using raytracing}
 Raytracing is an old computer vision problem which has been efficiently solved by \citeasnoun{raytracing}.
-The implementation in pyFAI is a direct re-implementation of this seminal work, using Cython-compiled extension for performances \cite{cython}.
+The implementation in pyFAI is a direct re-implementation of this seminal work, using a Cython-compiled extension for performance \cite{cython}.
           \subsubsection{Implementation of raytracing in pyFAI}
           \label{sec:raytracing}
 The software library pyFAI contains a module which performs raytracing, casting
@@ -242,7 +242,7 @@ each voxel.
 
 All rays cast in a pixel are averaged together and the result is stored in a sparse matrix, $\Phi$,
 where one pixel in the input image contributes to several pixels in the output image.
-Here is an example of the useage of this module:
+Here is an example of the usage of this module:
 \begin{verbatim}
      import numpy
      from scipy.sparse import csc_array
@@ -272,7 +272,7 @@ to a simple multiplication of this matrix $\Phi$ with the image $x$, considered 
 \label{eq:blur}
 z = \Phi \cdot x
 \end{equation}
-Which in Python \cite{python} can be implemented like this:
+which can be implemented in Python \cite{python} as:
 \begin{verbatim}
      parallax_image = sparse.dot(img.ravel()).reshape(img.shape)
 \end{verbatim}
@@ -292,11 +292,11 @@ Despite this matrix being square, it is not invertible, making this inversion an
 \hat{x} = argmin_x | \Phi \cdot x - z| + \lambda R(x)
 \end{equation}
 
-Where the first term is the data-term and the second the regularization term with $\lambda$ the regularization parameter and $R$ the penalization function.
+where the first term is the data term and the second the regularization term, with $\lambda$ the regularization parameter and $R$ the penalty function.
 This inversion of parallax effect is highly sensitive to the noise present in the measured image,
 noise that is inevitable, notably the Poisson noise.
 
-Several  pseudo-inversion tools, such as
+Several pseudo-inversion tools, such as
 Tikhonov regularization \cite{Tikhonov}, iterative least-squares solvers like LSMR \cite{LSMR}, or
 maximum-likelihood expectation maximization (MLEM) solver for Poissonian data 
 \cite{MLEM} have been tested.
@@ -305,11 +305,11 @@ These investigations are available as part of the pyFAI documentation \cite{deco
 % if possible, insert here the overlap of peak displacement and peak width for 
 
 Inverse methods are an active field of research in mathematics, and the methods tested
-(LSMR and MLEM) all turned out to be slow (typically dozens of seconds processing per 4-Mpixel frame), and introduce artefacts in the corrected images. 
+(LSMR and MLEM) all turned out to be slow (typically tens of seconds of processing per 4-Mpixel frame) and to introduce artefacts in the corrected images.
 Fewer artefacts were observed when using the MLEM algorithm.
 
-The usage of inverse methods is practically not feasible due to its computational requirements, neither is the approach proposed in \citeasnoun{resolution_function} which requires a precise description of the sample and beam-shape as implemented in pyFAI's documentation \cite{parallax_model}.
-We have thus searched for an another path which would applicable to address the parallax issue.
+The use of inverse methods is impractical due to their computational requirements, and so is the approach proposed in \citeasnoun{resolution_function}, which requires a precise description of the sample and beam shape, as implemented in pyFAI's documentation \cite{parallax_model}.
+We have thus searched for another approach that would be applicable to the parallax issue.
 
 \section{Average parallax effect}
      \subsection{Calculation of the displacement}
@@ -371,20 +371,20 @@ sensor thickness.
 
 The numerical value of this displacement can be compared with the simulation performed with 
 the convolution of a Gaussian-shaped beam profile with a truncated exponential decay in figure \ref{fig:displacement}. 
-The curve from formula  \ref{eq:mean-displacement} shows a remarkable similitude with the numerically integrated displacement from \citeasnoun{parallax_model}.
+The curve from equation \ref{eq:mean-displacement} shows a remarkable similarity to the numerically integrated displacement from \citeasnoun{parallax_model}.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{images/parallax/displacement.png}
-    \caption{Average distance between the point of incidence and point of interaction as function of the incidence angle, in pixels (75~µm) for a 450~µm silicon sensor and a X-Ray beam of 13.45~keV. The orange curve is this contribution, the green curve from \citeasnoun{resolution_function} and the blue curve from the numerical convolution \cite{parallax_model}}
+    \caption{Average distance between the point of incidence and the point of interaction as a function of the incidence angle, in pixels ($75\ \mu$m) for a $450\ \mu$m silicon sensor and an X-ray beam at 13.45~keV. The orange curve corresponds to equation \ref{eq:mean-displacement} (this work), the green curve to \citeasnoun{resolution_function} and the blue curve to the numerical convolution \cite{parallax_model}.}
     \label{fig:displacement}
 \end{figure}
 
 
 
 It is worth noting that if the sensor is assumed to be infinitely thick
-($t \rightarrow \infty$), the same integral leads to the simpler expression (\ref{eq:thick-sensor})
-which is already available from \citeasnoun{resolution_function} but without demonstration.
+($t \rightarrow \infty$), the same integral leads to the simpler expression (\ref{eq:thick-sensor}),
+which was already given by \citeasnoun{resolution_function}, albeit without derivation.
 \begin{equation}
 \label{eq:thick-sensor}
 \langle x \rangle = \frac{\sin(\alpha)}{\mu}
@@ -460,7 +460,7 @@ same peak had different incidence angles.
 The parallax effect, i.e. the volumetric absorption of photons within the thickness of
 the sensor, displaces and broadens the diffraction peaks recorded with 2D area
 detectors, degrading the quality of geometry calibrations and of the extracted
-diffraction data at scattering angles beyond $30$°.
+diffraction data at scattering angles beyond $30^\circ$.
 
 Two complementary approaches to cope with this effect, both implemented in the pyFAI
 library, have been presented.
