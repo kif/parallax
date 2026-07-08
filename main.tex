@@ -292,12 +292,12 @@ p = \Phi \cdot r
 \end{equation}
 which can be implemented in Python \cite{python} as:
 \begin{verbatim}
-     parallax_image = sparse.dot(img.ravel()).reshape(img.shape)
+     parallax_image = sparse.dot(raw_image.ravel()).reshape(raw_image.shape)
 \end{verbatim}
 
-Here \texttt{img} is a synthetic powder diffraction frame ($r$): the \texttt{ravel()}
-method flattens the 2D image into a vector, which is multiplied by the sparse matrix,
-and the result is reshaped back to the original image shape.
+Here \texttt{raw\_image} is a synthetic powder diffraction frame ($r$): the \texttt{ravel()}
+method flattens the 2D image into a vector, which is multiplied by the sparse matrix $\Phi$,
+and the result is reshaped back to the original image shape: \texttt{parallax\_image}.
 
      \subsection{Correction of the parallax effect}
      \label{sec:deconvolution}
