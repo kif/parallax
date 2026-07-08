@@ -259,7 +259,8 @@ each voxel.
 
 All rays cast in a pixel are averaged together and the result is stored in a sparse matrix, $\Phi$,
 where one pixel in the input image contributes to several pixels in the output image.
-Here is an example of the usage of this module:
+Here is an example of the usage of this module, which relies on NumPy \cite{numpy}
+and on the sparse-matrix algebra of SciPy \cite{scipy}:
 \begin{verbatim}
      import numpy
      from scipy.sparse import csc_array

@@ -46,10 +46,9 @@ Points restants de la relecture (les corrections d'anglais, point A, ont été a
   8 juillet 2026.
 - [x] **Hammersley et al. (1994)** (clé `fit2d1994`) — cité en tête de la section 2
   pour appuyer « The parallax effect has been known for a long time » (8 juillet 2026).
-- [ ] **NumPy** (Harris et al., 2020, *Nature* **585**, 357–362) et **SciPy**
-  (Virtanen et al., 2020, *Nature Methods* **17**, 261–272) — le code utilise `numpy`
-  et `scipy.sparse` alors que Python et Cython sont déjà cités.
-- [ ] Optionnel : **Dioptas** (Prescher & Prakapenka, 2015, *High Press. Res.* **35**,
-  223–230) en §2.2, comme correction d'incidence oblique existante dans les logiciels
-  courants.
+- [x] **NumPy** et **SciPy** — cités en §3.2.1 ; anciennes entrées obsolètes
+  (Oliphant 2007, Jones 2001) remplacées par les papiers *Nature* 2020 avec tous les
+  auteurs (8 juillet 2026).
+- ~~Optionnel : **Dioptas** (Prescher & Prakapenka, 2015)~~ — écarté le 8 juillet 2026 :
+  non pertinent car Dioptas se base sur pyFAI (pas une approche indépendante).
 - [ ] Optionnel : certificats **NIST** pour SRM640 et SRM674.
